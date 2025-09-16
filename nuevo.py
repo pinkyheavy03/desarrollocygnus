@@ -13,6 +13,13 @@ from tkinter import font # Importa la clase font para trabajar con fuentes en Tk
 # Lista para almacenar las referencias de las ventanas secundarias
 ventanas_hijas = []
 
+# --- CONFIGURACIÓN GLOBAL DE BOTONES y VENTANAS---
+# Define una variable para la altura uniforme de los botones
+BUTTON_HEIGHT = 1
+# Define el tamaño para las ventanas secundarias
+VENTANA_SECUNDARIA_ANCHO = 220
+VENTANA_SECUNDARIA_ALTO = 460
+
 # Configurar salida estándar para UTF-8 en Windows
 # sys.stdout.reconfigure(encoding='utf-8')
 
@@ -451,10 +458,7 @@ def generar_comando_kubectl():
     ventana_opciones.title("GENERADOR")
     ventanas_hijas.append(ventana_opciones)
     ventana_opciones.transient(root)
-    ancho_nueva = 220
-    alto_nueva = 490
-    ventana_opciones.geometry(f"230x470+{nueva_x}+{y}")
-
+    ventana_opciones.geometry(f"{VENTANA_SECUNDARIA_ANCHO}x{VENTANA_SECUNDARIA_ALTO}+{nueva_x}+{y}")
     ventana_opciones.configure(bg="#111111")
     frame_kubectl = tk.Frame(ventana_opciones, bg="#111111")
     frame_kubectl.pack(pady=5, fill="x", padx=20)
@@ -547,38 +551,38 @@ filter log like /(?i)error|failed/
 
     # 🔹 PODs LIVE y TOP POD
     frame_pods = tk.Frame(frame_kubectl, bg="#111111")
-    frame_pods.grid(row=1, column=0, columnspan=2, pady=(0, 5), sticky="ew")
+    frame_pods.grid(row=1, column=0, columnspan=2, pady=5, sticky="ew")
     frame_pods.columnconfigure(0, weight=1)
     frame_pods.columnconfigure(1, weight=1)
 
     btn_pods_live = tk.Button(frame_pods, text="LIVE", command=pods_live_monitor,
-                              width=20, bg="#E9E9E9", fg="black", font=("Arial", 10, "bold"))
-    btn_pods_live.grid(row=0, column=0, padx=5, pady=5)
+                              width=20, bg="#E9E9E9", fg="black", font=("Arial", 10, "bold"), height=BUTTON_HEIGHT)
+    btn_pods_live.grid(row=0, column=0, padx=5, pady=0)
     btn_pods_live.bind("<Enter>", on_enter)
     btn_pods_live.bind("<Leave>", on_leave)
 
     btn_top_pod = tk.Button(frame_pods, text="TOP", command=lambda: copiar_comando("kubectl.exe top pod -n"),
-                            width=20, bg="#E9E9E9", fg="black", font=("Arial", 10, "bold"))
-    btn_top_pod.grid(row=0, column=1, padx=5, pady=5)
+                            width=20, bg="#E9E9E9", fg="black", font=("Arial", 10, "bold"), height=BUTTON_HEIGHT)
+    btn_top_pod.grid(row=0, column=1, padx=5, pady=0)
     btn_top_pod.bind("<Enter>", on_enter)
     btn_top_pod.bind("<Leave>", on_leave)
 
 
     # 🔹 Eliminar PODs y LOGs
     frame_pods_logs = tk.Frame(frame_kubectl, bg="#111111")
-    frame_pods_logs.grid(row=2, column=0, columnspan=2, pady=(0, 5), sticky="ew")
+    frame_pods_logs.grid(row=2, column=0, columnspan=2, pady=5, sticky="ew")
     frame_pods_logs.columnconfigure(0, weight=1)
     frame_pods_logs.columnconfigure(1, weight=1)
 
     btn_eliminar_pods = tk.Button(frame_pods_logs, text="DELETE", command=eliminar_pods,
-                                  width=20, bg="#E9E9E9", fg="black", font=("Arial", 10, "bold"))
-    btn_eliminar_pods.grid(row=0, column=0, padx=5, pady=5)
+                                  width=20, bg="#E9E9E9", fg="black", font=("Arial", 10, "bold"), height=BUTTON_HEIGHT)
+    btn_eliminar_pods.grid(row=0, column=0, padx=5, pady=0)
     btn_eliminar_pods.bind("<Enter>", on_enter)
     btn_eliminar_pods.bind("<Leave>", on_leave)
 
     btn_logs = tk.Button(frame_pods_logs, text="LOGs GREP", command=generar_logs,
-                         width=20, bg="#E9E9E9", fg="black", font=("Arial", 10, "bold"))
-    btn_logs.grid(row=0, column=1, padx=5, pady=5)
+                         width=20, bg="#E9E9E9", fg="black", font=("Arial", 10, "bold"), height=BUTTON_HEIGHT)
+    btn_logs.grid(row=0, column=1, padx=5, pady=0)
     btn_logs.bind("<Enter>", on_enter)
     btn_logs.bind("<Leave>", on_leave)
 
@@ -586,16 +590,16 @@ filter log like /(?i)error|failed/
     # Inicio de la reubicación
     # Frame para el título y los botones de CLUSTER
     frame_cluster = tk.Frame(frame_kubectl, bg="#111111")
-    frame_cluster.grid(row=3, column=0, columnspan=2, pady=(0, 5), sticky="ew")
+    frame_cluster.grid(row=3, column=0, columnspan=2, pady=5, sticky="ew")
     frame_cluster.columnconfigure(0, weight=1)
     frame_cluster.columnconfigure(1, weight=1)
     label_cluster = tk.Label(frame_cluster, text="CLUSTER", bg="#111111", fg="white", font=("Arial", 12, "bold"))
     label_cluster.grid(row=0, column=0, columnspan=2, pady=0, sticky="ew")
-    btn_listar_cluster = tk.Button(frame_cluster, text="LISTAR", command=listar_cluster, height=1, width=13, bg="#E9E9E9", fg="black", font=("Arial", 10, "bold"), relief="solid", bd=2)
+    btn_listar_cluster = tk.Button(frame_cluster, text="LISTAR", command=listar_cluster, height=BUTTON_HEIGHT, width=13, bg="#E9E9E9", fg="black", font=("Arial", 10, "bold"), relief="solid", bd=2)
     btn_listar_cluster.grid(row=1, column=0, padx=5, pady=(0, 5), sticky="ew")
     btn_listar_cluster.bind("<Enter>", on_enter)
     btn_listar_cluster.bind("<Leave>", on_leave)
-    btn_cluster = tk.Button(frame_cluster, text="INGRESAR", command=ingresar_a_cluster, height=1, width=13, bg="#E9E9E9", fg="black", font=("Arial", 10, "bold"), relief="solid", bd=2)
+    btn_cluster = tk.Button(frame_cluster, text="INGRESAR", command=ingresar_a_cluster, height=BUTTON_HEIGHT, width=13, bg="#E9E9E9", fg="black", font=("Arial", 10, "bold"), relief="solid", bd=2)
     btn_cluster.grid(row=1, column=1, padx=5, pady=(0, 5), sticky="ew")
     btn_cluster.bind("<Enter>", on_enter)
     btn_cluster.bind("<Leave>", on_leave)
@@ -604,11 +608,11 @@ filter log like /(?i)error|failed/
 
     # Título de la sección
     label_deployment = tk.Label(frame_kubectl, text="DEPLOYMENT", bg="#111111", fg="white", font=("Arial", 12, "bold"))
-    label_deployment.grid(row=8, column=0, columnspan=2, pady=(0, 5), sticky="ew")
+    label_deployment.grid(row=8, column=0, columnspan=2, pady=5, sticky="ew")
     
     # Crear un frame contenedor para los botones
     frame_deployment = tk.Frame(frame_kubectl, bg="#111111")
-    frame_deployment.grid(row=9, column=0, columnspan=2, pady=(0, 5), sticky="ew")
+    frame_deployment.grid(row=9, column=0, columnspan=2, pady=5, sticky="ew")
     frame_deployment.columnconfigure(0, weight=1)
     frame_deployment.columnconfigure(1, weight=1)
     
@@ -619,8 +623,8 @@ filter log like /(?i)error|failed/
             copiar_comando(f"kubectl get deployment -n {ns}")
     
     btn_listar_d = tk.Button(frame_deployment, text="LIST", command=listar_deployment,
-                             width=15, bg="#E9E9E9", fg="black", font=("Arial", 10, "bold"))
-    btn_listar_d.grid(row=0, column=0, padx=5, pady=5)
+                             width=15, bg="#E9E9E9", fg="black", font=("Arial", 10, "bold"), height=BUTTON_HEIGHT)
+    btn_listar_d.grid(row=0, column=0, padx=5, pady=0)
     btn_listar_d.bind("<Enter>", on_enter)
     btn_listar_d.bind("<Leave>", on_leave)
     
@@ -632,18 +636,18 @@ filter log like /(?i)error|failed/
             copiar_comando(f"kubectl describe deployment -n {ns} {name}")
     
     btn_describir_d = tk.Button(frame_deployment, text="DESCRIBE", command=describir_deployment,
-                                width=15, bg="#E9E9E9", fg="black", font=("Arial", 10, "bold"))
-    btn_describir_d.grid(row=0, column=1, padx=5, pady=5)
+                                width=15, bg="#E9E9E9", fg="black", font=("Arial", 10, "bold"), height=BUTTON_HEIGHT)
+    btn_describir_d.grid(row=0, column=1, padx=5, pady=0)
     btn_describir_d.bind("<Enter>", on_enter)
     btn_describir_d.bind("<Leave>", on_leave)
     
     # Título de la sección CONFIG MAP
     label_configmap = tk.Label(frame_kubectl, text="CONFIG MAP", bg="#111111", fg="white", font=("Arial", 12, "bold"))
-    label_configmap.grid(row=10, column=0, columnspan=2, pady=(0, 5), sticky="ew")
+    label_configmap.grid(row=10, column=0, columnspan=2, pady=5, sticky="ew")
     
     # Crear un frame contenedor para los botones
     frame_configmap = tk.Frame(frame_kubectl, bg="#111111")
-    frame_configmap.grid(row=11, column=0, columnspan=2, pady=(0, 5), sticky="ew")
+    frame_configmap.grid(row=11, column=0, columnspan=2, pady=5, sticky="ew")
     frame_configmap.columnconfigure(0, weight=1)
     frame_configmap.columnconfigure(1, weight=1)
     
@@ -654,8 +658,8 @@ filter log like /(?i)error|failed/
             copiar_comando(f"kubectl.exe get configmaps -n {ns}")
     
     btn_listar_c = tk.Button(frame_configmap, text="LIST", command=listar_configmap,
-                             width=15, bg="#E9E9E9", fg="black", font=("Arial", 10, "bold"))
-    btn_listar_c.grid(row=0, column=0, padx=5, pady=5)
+                             width=15, bg="#E9E9E9", fg="black", font=("Arial", 10, "bold"), height=BUTTON_HEIGHT)
+    btn_listar_c.grid(row=0, column=0, padx=5, pady=0)
     btn_listar_c.bind("<Enter>", on_enter)
     btn_listar_c.bind("<Leave>", on_leave)
     
@@ -667,8 +671,8 @@ filter log like /(?i)error|failed/
             copiar_comando(f"kubectl.exe describe configmap {name} -n {ns}")
     
     btn_describir_c = tk.Button(frame_configmap, text="DESCRIBE", command=describir_configmap,
-                                width=15, bg="#E9E9E9", fg="black", font=("Arial", 10, "bold"))
-    btn_describir_c.grid(row=0, column=1, padx=5, pady=5)
+                                width=15, bg="#E9E9E9", fg="black", font=("Arial", 10, "bold"), height=BUTTON_HEIGHT)
+    btn_describir_c.grid(row=0, column=1, padx=5, pady=0)
     btn_describir_c.bind("<Enter>", on_enter)
     btn_describir_c.bind("<Leave>", on_leave)
 
@@ -678,21 +682,21 @@ filter log like /(?i)error|failed/
 
 
     label_cloudwatch = tk.Label(frame_kubectl, text="EKS LOGs INSIGHTS", bg="#111111", fg="white", font=("Arial", 12, "bold"))
-    label_cloudwatch.grid(row=12, column=0, columnspan=2, pady=(0, 5), sticky="ew")
+    label_cloudwatch.grid(row=12, column=0, columnspan=2, pady=(20, 5), sticky="ew")
     
-    btn_logs_grep = tk.Button(frame_kubectl, text="LOGs GREP", command=generar_query_cloudwatch, bg="#E9E9E9", fg="black", font=("Arial", 10, "bold"))
-    btn_logs_grep.grid(row=13, column=0, columnspan=2, padx=5, pady=(0, 5), sticky="ew")
+    btn_logs_grep = tk.Button(frame_kubectl, text="LOGs GREP", command=generar_query_cloudwatch, bg="#E9E9E9", fg="black", font=("Arial", 10, "bold"), height=BUTTON_HEIGHT)
+    btn_logs_grep.grid(row=13, column=0, columnspan=2, padx=5, pady=0, sticky="ew")
     btn_logs_grep.bind("<Enter>", on_enter)
     btn_logs_grep.bind("<Leave>", on_leave)
     
-    btn_conteo_errores = tk.Button(frame_kubectl, text="CONTEO ERRORES", command=generar_query_cloudwatch_conteo, bg="#E9E9E9", fg="black", font=("Arial", 10, "bold"))
-    btn_conteo_errores.grid(row=14, column=0, columnspan=2, padx=5, pady=(0, 5), sticky="ew")
+    btn_conteo_errores = tk.Button(frame_kubectl, text="CONTEO ERRORES", command=generar_query_cloudwatch_conteo, bg="#E9E9E9", fg="black", font=("Arial", 10, "bold"), height=BUTTON_HEIGHT)
+    btn_conteo_errores.grid(row=14, column=0, columnspan=2, padx=5, pady=0, sticky="ew")
     btn_conteo_errores.bind("<Enter>", on_enter)
     btn_conteo_errores.bind("<Leave>", on_leave)
     
     # Crear un frame contenedor centrado en el grid
     frame_cmds = tk.Frame(frame_kubectl, bg="#111111")
-    frame_cmds.grid(row=15, column=0, columnspan=2, pady=(0, 5), sticky="ew")
+    frame_cmds.grid(row=15, column=0, columnspan=2, pady=5, sticky="ew")
 
     # Centrar el contenido dentro del frame
     frame_cmds.columnconfigure(0, weight=1)
@@ -700,15 +704,15 @@ filter log like /(?i)error|failed/
 
     # Botón CMD 3
     btn_cmd3 = tk.Button(frame_cmds, text="CMD 3", command=lambda: copiar_comando("echo CMD 3"),
-                        bg="#E9E9E9", fg="black", font=("Arial", 10, "bold"))
-    btn_cmd3.grid(row=0, column=0, padx=5)
+                        bg="#E9E9E9", fg="black", font=("Arial", 10, "bold"), height=BUTTON_HEIGHT)
+    btn_cmd3.grid(row=0, column=0, padx=5, pady=0)
     btn_cmd3.bind("<Enter>", on_enter)
     btn_cmd3.bind("<Leave>", on_leave)
 
     # Botón CMD 4
     btn_cmd4 = tk.Button(frame_cmds, text="CMD 4", command=lambda: copiar_comando("echo CMD 4"),
-                        bg="#E9E9E9", fg="black", font=("Arial", 10, "bold"))
-    btn_cmd4.grid(row=0, column=1, padx=5)
+                        bg="#E9E9E9", fg="black", font=("Arial", 10, "bold"), height=BUTTON_HEIGHT)
+    btn_cmd4.grid(row=0, column=1, padx=5, pady=0)
     btn_cmd4.bind("<Enter>", on_enter)
     btn_cmd4.bind("<Leave>", on_leave)
 
@@ -731,26 +735,24 @@ def mostrar_script():
     nueva_x = x + ancho_principal
     
     for ventana in ventanas_hijas:
-        if ventana.winfo_exists() and ventana.title() == "MI BANCOLOMBIA":
+        if ventana.winfo_exists() and ventana.title() == "NUEVOS SCRIPTS":
             ventana.geometry(f"+{nueva_x}+{y}")
             ventana.lift()
             ventana.focus_force()
             return #
 
     ventana_script = tk.Toplevel(root)
-    ventana_script.title("MI BANCOLOMBIA")
+    ventana_script.title("NUEVOS SCRIPTS")
     ventanas_hijas.append(ventana_script)
     ventana_script.transient(root)
-    ancho_nueva = 230
-    alto_nueva = 290
-    ventana_script.geometry(f"{ancho_nueva}x{alto_nueva}+{nueva_x}+{y}")
+    ventana_script.geometry(f"{VENTANA_SECUNDARIA_ANCHO}x{VENTANA_SECUNDARIA_ALTO}+{nueva_x}+{y}")
     ventana_script.configure(bg="#111111")
     frame_script = tk.Frame(ventana_script, bg="black")
     frame_script.pack(expand=True, padx=5, pady=10)
     button_texts = ["GOKU", "SCRIPT1", "SCRIPT2", "SCRIPT3", "SCRIPT4", "SCRIPT5"]
     for text in button_texts:
         btn = tk.Button(frame_script, text=text, command=lambda t="~/Documents/goku": copiar_script(t), #
-                        bg="#E9E9E9", fg="black", font=("Arial", 10, "bold"), relief="solid", bd=2)
+                        height=BUTTON_HEIGHT, bg="#E9E9E9", fg="black", font=("Arial", 10, "bold"), relief="solid", bd=2)
         btn.pack(pady=5, fill="x")
         btn.bind("<Enter>", on_enter)
         btn.bind("<Leave>", on_leave)
@@ -758,7 +760,7 @@ def mostrar_script():
 # Configuración de la ventana principal
 root = tk.Tk()
 root.title("by PINKY")
-root.geometry("230x530")
+root.geometry("230x590")
 root.configure(bg="#111111")
 root.resizable(False, False)
 
@@ -789,31 +791,56 @@ style.configure("TButton", background="white", foreground="black", font=("Arial"
 frame_documentacion = tk.Frame(root, bg="#111111")
 frame_documentacion.pack(pady=10)
 label_titulo = tk.Label(frame_documentacion, text="DOCUMENTACIÓN", bg="#111111", fg="white", font=("Arial", 12, "bold"))
-label_titulo.pack(pady=0)
+label_titulo.pack(pady=5)
 frame_botones_doc = tk.Frame(frame_documentacion, bg="#111111")
-frame_botones_doc.pack(pady=0)
-btn_crq = tk.Button(frame_botones_doc, text="CRQ", command=iniciar_proceso_crq, height=1, bg="#E9E9E9", fg="black", font=("Arial", 10, "bold"), relief="solid", bd=2)
+frame_botones_doc.pack(pady=5)
+btn_crq = tk.Button(frame_botones_doc, text="CRQ", command=iniciar_proceso_crq, height=BUTTON_HEIGHT, bg="#E9E9E9", fg="black", font=("Arial", 10, "bold"), relief="solid", bd=2)
 btn_crq.pack(side=tk.LEFT, padx=5)
 btn_crq.bind("<Enter>", on_enter)
 btn_crq.bind("<Leave>", on_leave)
-btn_task = tk.Button(frame_botones_doc, text="TASK", command=iniciar_proceso_task, height=1, bg="#E9E9E9", fg="black", font=("Arial", 10, "bold"), relief="solid", bd=2)
+btn_task = tk.Button(frame_botones_doc, text="TASK", command=iniciar_proceso_task, height=BUTTON_HEIGHT, bg="#E9E9E9", fg="black", font=("Arial", 10, "bold"), relief="solid", bd=2)
 btn_task.pack(side=tk.LEFT, padx=5)
 btn_task.bind("<Enter>", on_enter)
 btn_task.bind("<Leave>", on_leave)
-btn_pods = tk.Button(frame_botones_doc, text="PODS", command=iniciar_proceso_pods, height=1, bg="#E9E9E9", fg="black", font=("Arial", 10, "bold"), relief="solid", bd=2)
+btn_pods = tk.Button(frame_botones_doc, text="PODS", command=iniciar_proceso_pods, height=BUTTON_HEIGHT, bg="#E9E9E9", fg="black", font=("Arial", 10, "bold"), relief="solid", bd=2)
 btn_pods.pack(side=tk.LEFT, padx=5)
 btn_pods.bind("<Enter>", on_enter)
 btn_pods.bind("<Leave>", on_leave)
 
 # Botón de Evento/Incidente en un frame separado para su propia fila
 frame_evento = tk.Frame(root, bg="#111111")
-frame_evento.pack(pady=0)
+frame_evento.pack(pady=5)
 
 btn_evento = tk.Button(
     frame_evento,
     text="EVENTO / INCIDENTE",
     command=generar_evento_incidente,
-    width=18,
+    width=20,
+    bg="#E9E9E9",
+    fg="black",
+    font=("Arial", 10, "bold"),
+    relief="solid",
+    bd=2,
+    height=BUTTON_HEIGHT
+)
+
+btn_evento.pack(pady=0)
+btn_evento.bind("<Enter>", on_enter)
+btn_evento.bind("<Leave>", on_leave)
+
+# Frame para el título y el botón de KUBECTL
+frame_kubectl = tk.Frame(root, bg="#111111")
+frame_kubectl.pack(pady=5, fill="x", padx=20)
+frame_kubectl.columnconfigure(0, weight=1)
+label_kubectl = tk.Label(frame_kubectl, text="KUBECTL", bg="#111111", fg="white", font=("Arial", 12, "bold"))
+label_kubectl.grid(row=0, column=0, pady=5, sticky="ew")
+
+btn_kubectl = tk.Button(
+    frame_kubectl,
+    text="GENERADOR COMANDOS",
+    command=generar_comando_kubectl,
+    height=BUTTON_HEIGHT,              
+    width=35,              
     bg="#E9E9E9",
     fg="black",
     font=("Arial", 10, "bold"),
@@ -821,31 +848,7 @@ btn_evento = tk.Button(
     bd=2
 )
 
-btn_evento.pack(pady=(0, 5))  # ← sin padx y sin fill="x"
-btn_evento.bind("<Enter>", on_enter)
-btn_evento.bind("<Leave>", on_leave)
-
-# Frame para el título y el botón de KUBECTL
-frame_kubectl = tk.Frame(root, bg="#111111") #
-frame_kubectl.pack(pady=5, fill="x", padx=20)  # ← nuevo
-frame_kubectl.columnconfigure(0, weight=1)
-label_kubectl = tk.Label(frame_kubectl, text="KUBECTL", bg="#111111", fg="white", font=("Arial", 12, "bold"))
-label_kubectl.grid(row=0, column=0, pady=0, sticky="ew")
-
-btn_kubectl = tk.Button(
-    frame_kubectl,
-    text="GENERADOR COMANDOS",
-    command=generar_comando_kubectl,
-    height=1,              # Aumenta la altura visual
-    width=35,              # Controla el ancho en caracteres
-    bg="#E9E9E9",
-    fg="black",
-    font=("Arial", 10, "bold"),  # Reduce ligeramente el tamaño de fuente
-    relief="solid",
-    bd=2
-)
-
-btn_kubectl.grid(row=1, column=0, padx=10, pady=(0, 5), sticky="ew")
+btn_kubectl.grid(row=1, column=0, padx=10, pady=5, sticky="ew")
 btn_kubectl.bind("<Enter>", on_enter)
 btn_kubectl.bind("<Leave>", on_leave)
 
@@ -853,7 +856,7 @@ btn_script = tk.Button(
     frame_kubectl,
     text="SCRIPTS",  # Mayúsculas para consistencia
     command=mostrar_script,
-    height=1,
+    height=BUTTON_HEIGHT,
     width=20,
     bg="#E9E9E9",
     fg="black",
@@ -861,18 +864,17 @@ btn_script = tk.Button(
     relief="solid",
     bd=2
 )
-btn_script.grid(row=2, column=0, padx=40, pady=(0, 5), sticky="ew")
+btn_script.grid(row=2, column=0, padx=40, pady=5, sticky="ew")
 btn_script.bind("<Enter>", on_enter)
 btn_script.bind("<Leave>", on_leave)
 
-# Frame para el título y los botones de CONTACTOS
 # Frame para el título y los botones de CONTACTOS
 frame_contactos = tk.Frame(root, bg="#111111")
 frame_contactos.pack(pady=5, fill="x")
 frame_contactos.columnconfigure(0, weight=1)
 frame_contactos.columnconfigure(1, weight=1)
 label_contactos = tk.Label(frame_contactos, text="CONTACTOS", bg="#111111", fg="white", font=("Arial", 12, "bold"))
-label_contactos.grid(row=0, column=0, columnspan=2, pady=0, sticky="ew")
+label_contactos.grid(row=0, column=0, columnspan=2, pady=5, sticky="ew")
 
 
 
@@ -881,8 +883,8 @@ subframe_botones_contactos = tk.Frame(frame_contactos, bg="#111111")
 subframe_botones_contactos.grid(row=1, column=0, columnspan=2, pady=(0, 5))
 
 btn_tel = tk.Button(subframe_botones_contactos, text="TEL", command=mostrar_telefonos,
-                    width=10, bg="#E9E9E9", fg="black", font=("Arial", 10, "bold"),
-                    relief="solid", bd=2)
+                    width=5, bg="#E9E9E9", fg="black", font=("Arial", 10, "bold"),
+                    relief="solid", bd=2, height=BUTTON_HEIGHT)
 btn_tel.pack(side=tk.LEFT, padx=5)
 btn_tel.bind("<Enter>", on_enter)
 btn_tel.bind("<Leave>", on_leave)
@@ -967,8 +969,8 @@ contactos_nuestros = sorted([
 # Botón NUESTROS
 
 btn_nuestros = tk.Button(subframe_botones_contactos, text="NUESTROS", command=mostrar_nuestros,
-                         width=10, bg="#E9E9E9", fg="black", font=("Arial", 10, "bold"),
-                         relief="solid", bd=2)
+                         width=8, bg="#E9E9E9", fg="black", font=("Arial", 10, "bold"),
+                         relief="solid", bd=2, height=BUTTON_HEIGHT)
 btn_nuestros.pack(side=tk.LEFT, padx=5)
 btn_nuestros.bind("<Enter>", on_enter)
 btn_nuestros.bind("<Leave>", on_leave)
@@ -980,7 +982,7 @@ btn_nuestros.bind("<Leave>", on_leave)
 frame_turnos = tk.Frame(root, bg="#111111")
 frame_turnos.pack(pady=5, fill="x")
 label_turnos = tk.Label(frame_turnos, text="PRESENTACIÓN TURNOS", bg="#111111", fg="white", font=("Arial", 12, "bold"))
-label_turnos.pack(pady=(0, 5))
+label_turnos.pack(pady=5)
 
 # Lista de integrantes
 integrantes = [
@@ -996,15 +998,37 @@ integrantes = [
 # Función para seleccionar integrantes y copiar texto
 
 def seleccionar_integrantes(turno):
+    
+    def mover_arriba():
+        indices = listbox_seleccionados.curselection()
+        if not indices: return
+        for i in indices:
+            if i > 0:
+                texto = listbox_seleccionados.get(i)
+                listbox_seleccionados.delete(i)
+                listbox_seleccionados.insert(i - 1, texto)
+                listbox_seleccionados.selection_set(i - 1)
+    
+    def mover_abajo():
+        indices = listbox_seleccionados.curselection()
+        if not indices: return
+        for i in reversed(indices):
+            if i < listbox_seleccionados.size() - 1:
+                texto = listbox_seleccionados.get(i)
+                listbox_seleccionados.delete(i)
+                listbox_seleccionados.insert(i + 1, texto)
+                listbox_seleccionados.selection_set(i + 1)
+
     def confirmar_seleccion():
-        seleccionados = [listbox.get(i) for i in listbox.curselection()]
+        seleccionados = listbox_seleccionados.get(0, tk.END)
         if len(seleccionados) < 1:
             messagebox.showwarning("Advertencia", "Selecciona al menos un integrante.")
             return
-
+        
+        # Lógica para construir la frase
         if len(seleccionados) == 1:
             verbo = "continúo"
-            nombres = ""  # No mostrar el nombre
+            nombres = ""
         else:
             verbo = "continuamos"
             if len(seleccionados) == 2:
@@ -1024,48 +1048,75 @@ def seleccionar_integrantes(turno):
         root.update()
         messagebox.showinfo("Copiado", "El texto ha sido copiado correctamente al portapapeles.")
         ventana_seleccion.destroy()
-
-
+    
+    #  Ventana principal de selección
     ventana_seleccion = tk.Toplevel(root)
-    ventana_seleccion.title("Seleccionar integrantes")
-    ventana_seleccion.geometry("300x400")
+    ventana_seleccion.transient(root)
+    ventana_seleccion.title("Seleccionar y Ordenar")
+    ventana_seleccion.geometry("400x490")
     ventana_seleccion.configure(bg="#111111")
+    
+    # La línea para hacer la ventana modal
+    ventana_seleccion.grab_set() 
+    
+    frame_contenido = tk.Frame(ventana_seleccion, bg="#111111")
+    frame_contenido.pack(padx=10, pady=10, fill="both", expand=True)
 
-    label = tk.Label(ventana_seleccion, text="Selecciona los integrantes:", bg="black", fg="white", font=("Arial", 10, "bold"))
-    label.pack(pady=10)
-
-    listbox = tk.Listbox(ventana_seleccion, selectmode=tk.MULTIPLE, bg="#E9E9E9", fg="black", font=("Arial", 10), height=10)
-    listbox.pack(padx=10, pady=10, fill="both", expand=True)
-
-    integrantes = [
-        "Alvaro León Henao",
-        "Claudia Yaneth Uribe Mora",
-        "Edwin Fernando Rua",
-        "Eduer Ferney Quintero",
-        "Jonatan Fernando Rojas Marin",
-        "Juan Pablo Rosero",
-        "Mauricio Cardona Acosta"
-    ]
-
+    # Listbox para seleccionar los nombres
+    label_original = tk.Label(frame_contenido, text="1. Selecciona los integrantes:", bg="#111111", fg="white", font=("Arial", 10, "bold"))
+    label_original.pack(pady=5)
+    listbox_original = tk.Listbox(frame_contenido, selectmode=tk.MULTIPLE, bg="#E9E9E9", fg="black", font=("Arial", 10), height=7)
     for nombre in integrantes:
-        listbox.insert(tk.END, nombre)
+        listbox_original.insert(tk.END, nombre)
+    listbox_original.pack(fill="x", padx=10, pady=5)
+    
+    def pasar_seleccion():
+        seleccionados = [listbox_original.get(i) for i in listbox_original.curselection()]
+        if not seleccionados:
+            messagebox.showwarning("Advertencia", "Selecciona al menos un integrante de la lista.")
+            return
 
-    btn_confirmar = tk.Button(ventana_seleccion, text="Confirmar", command=confirmar_seleccion, bg="#E9E9E9", fg="black", font=("Arial", 10, "bold"))
-    btn_confirmar.pack(pady=10)
+        # Limpiar la lista de seleccionados y añadir los nuevos
+        listbox_seleccionados.delete(0, tk.END)
+        for nombre in seleccionados:
+            listbox_seleccionados.insert(tk.END, nombre)
+            
+    # Botón para pasar la selección
+    btn_pasar = tk.Button(frame_contenido, text="Añadir >>", command=pasar_seleccion, bg="#E9E9E9", fg="black", font=("Arial", 10, "bold"), height=BUTTON_HEIGHT)
+    btn_pasar.pack(pady=5)
+
+    # Listbox para los nombres seleccionados y reordenables
+    label_seleccionados = tk.Label(frame_contenido, text="2. Reordena la lista (si es necesario):", bg="#111111", fg="white", font=("Arial", 10, "bold"))
+    label_seleccionados.pack(pady=5)
+    listbox_seleccionados = tk.Listbox(frame_contenido, selectmode=tk.SINGLE, bg="#E9E9E9", fg="black", font=("Arial", 10), height=7)
+    listbox_seleccionados.pack(fill="x", padx=10, pady=5)
+
+    # Botones de subir y bajar
+    frame_mover = tk.Frame(frame_contenido, bg="#111111")
+    frame_mover.pack(pady=5)
+    btn_subir = tk.Button(frame_mover, text="▲ Subir", command=mover_arriba, bg="#E9E9E9", fg="black", font=("Arial", 9, "bold"), height=BUTTON_HEIGHT)
+    btn_subir.pack(side=tk.LEFT, padx=5)
+    btn_bajar = tk.Button(frame_mover, text="▼ Bajar", command=mover_abajo, bg="#E9E9E9", fg="black", font=("Arial", 9, "bold"), height=BUTTON_HEIGHT)
+    btn_bajar.pack(side=tk.LEFT, padx=5)
+
+    # Botón final para confirmar
+    btn_confirmar = tk.Button(frame_contenido, text="3. Generar", command=confirmar_seleccion, bg="#E9E9E9", fg="black", font=("Arial", 10, "bold"), height=BUTTON_HEIGHT)
+    btn_confirmar.pack(pady=20)
+
 
 # Botones de turnos
 frame_botones_turnos = tk.Frame(frame_turnos, bg="#111111")
-frame_botones_turnos.pack()
+frame_botones_turnos.pack(pady=5)
 for turno in ["6-2", "2-10", "10-6"]:
     btn = tk.Button(frame_botones_turnos, text=turno, command=lambda t=turno: seleccionar_integrantes(t),
-                    height=1, bg="#E9E9E9", fg="black", font=("Arial", 10, "bold"), relief="solid", bd=2, width=6)
+                    height=BUTTON_HEIGHT, bg="#E9E9E9", fg="black", font=("Arial", 10, "bold"), relief="solid", bd=2, width=6)
     btn.pack(side=tk.LEFT, padx=5)
     btn.bind("<Enter>", on_enter)
     btn.bind("<Leave>", on_leave)
 
 
 frame_img = tk.Frame(root, bg="black")
-frame_img.pack(pady=10)
+frame_img.pack(pady=5)
 def abrir_url(url):
     """Abre la URL dada en una nueva ventana del navegador."""
     try:
@@ -1094,7 +1145,7 @@ def imagen_clicada(event):
     ventana_botones.title("Enlaces Cygnus")
     ventanas_hijas.append(ventana_botones)
     ventana_botones.transient(root)
-    ventana_botones.geometry(f"228x530+{nueva_x}+{y}")
+    ventana_botones.geometry(f"{VENTANA_SECUNDARIA_ANCHO}x{VENTANA_SECUNDARIA_ALTO}+{nueva_x}+{y}")
     ventana_botones.configure(bg="#111111")
     ventana_botones.resizable(False, False)
 
@@ -1146,15 +1197,15 @@ def imagen_clicada(event):
         ("TURNOS", "https://bancolombia.sharepoint.com/:x:/r/teams/Cygnus-AWS/_layouts/15/Doc.aspx?sourcedoc=%7B6296F025-6862-40E7-9F15-B3A957E83C53%7D&file=Turnos%20Cygnus%202025.xlsx&action=default&mobileredirect=true", "#CCB363"),
         ("VACACIONES", "https://bancolombia.sharepoint.com/:x:/r/teams/PlataformasyDisponibilidaddeTI/_layouts/15/Doc.aspx?sourcedoc=%7B3D2AC0FD-DEAD-4AF7-B354-6775428DF4DB%7D&file=Vacaciones%20CYGNUS.xlsx&action=default&mobileredirect=true", "#CCB363"),
         ("PROGRAMACIÓN HAPPY FRIDAY", "https://bancolombia.sharepoint.com/:x:/r/teams/Cygnus-AWS/_layouts/15/Doc.aspx?sourcedoc=%7B7B333C20-3584-4D0B-ACFA-00CDB1263EBE%7D&file=HAPPY%20FRIDAY%20Y%20CUMPLEA%C3%91OS%20CYGNUS.xlsx&action=default&mobileredirect=true", "#CCB363"),
-        ("REPORTE HAPPY", "https://bancolombia.sharepoint.com.mcas.ms/sites/CO-VGH/SitePages/mis-beneficios-a-tiempo.aspx", "#CCB363"),
+        ("REPORTE HAPPY", "https://bancolombia.sharepoint.com.mcas.ms/sites/co-vgh/SitePages/mis-beneficios-a-tiempo.aspx", "#CCB363"),
         ("CYGNUS HOME", "https://bancolombia.sharepoint.com/teams/Cygnus-AWS/SitePages/TrainingHome.aspx", "#CCB363"),
         ("CARPETA CYGNUS ONE DRIVE", "https://bancolombia.sharepoint.com/teams/PlataformasyDisponibilidaddeTI/Documentos%20compartidos/Forms/AllItems.aspx?id=%2Fteams%2FPlataformasyDisponibilidaddeTI%2FDocumentos%20compartidos%2FGeneral%2F02%2E%20Areas%2FIntegrada%C2%A0Operaci%C3%B3n%20TI%2F2FCYGNUS&viewid=57766697%2D4feb%2D4155%2Daa50%2D7e170cf7663f&csf=1&web=1&e=EkAc8b&FolderCTID=0x0120005E9D7AC01B2F224C9592BE475FCCCF12", "#CCB363"),
         ("CONECTADOS", "https://performancemanager8.successfactors.com/sf/start?_s.crb=aXY4tvGvZ%252bhWEJ65r%252bfyKs1XnEaUsD71QXK3e6RrN%252f8%253d", "#CCB363"),
-        ("DIRECTORIO ACTIVO", "https://apps.powerapps.com/play/e/6bdfe354-f250-e0e7-941d-103fc5c5001d/a/903ea87a-6b3a-4311-b962-f96b75e674d6?tenantId=b5e244bd-c492-495b-8b10-61bfd453e423&amp;hint=8bd66a5b-a6b7-43c4-8bdb-7d71972150ca&amp;sourcetime=1757015480085&source=teamsLinkUnfurling", "#B85CCF"),
+        ("DIRECTORIO ACTIVO GRUPOS", "https://apps.powerapps.com/play/e/6bdfe354-f250-e0e7-941d-103fc5c5001d/a/903ea87a-6b3a-4311-b962-f96b75e674d6?tenantId=b5e244bd-c492-495b-8b10-61bfd453e423&hint=8bd66a5b-a6b7-43c4-8bdb-7d71972150ca&sourcetime=1757015480085&source=teamsLinkUnfurling", "#B85CCF"),
         ("PORTAL CONTINUIDAD TI", "https://apps.powerapps.com/play/e/6bdfe354-f250-e0e7-941d-103fc5c5001d/a/913bb453-3222-4666-be40-dd026f570605?tenantId=b5e244bd-c492-495b-8b10-61bfd453e423", "#B85CCF"),
         ("PIPELINES", "https://bancolombia-is.onbmc.com/helix/index.html#/Autogestionados.Bancolombia/view/Autogestionados.Bancolombia:Servicios%20autogestionados", "#B85CCF"),
-        ("GESTIONAR CAMBIOS TI", "https://bancolombia.sharepoint.com/sites/co-vsti/SitePages/sobre-nosotros_modelo-operativo_procesos_gestionar-cambios.aspx?xsdata=MDV8MDJ8fDdlNmJkODZkZDFiZDRiZDQ4YTgwMDhkZGVmZThjZTFmfGI1ZTI0NGJkYzQ5MjQ0NWI4YjEwNjFiZmQ0NTNlNDIzfDB8MHw2Mzg5MzA1MDUzMjYxMTU2Mjd8VW5rbm93bnxWR1ZoYlhOVFpXTjFjbWwwZVZObGNuWnBZMlY4ZXlKRFFTSTZJbFJsWVcxelgwRlVVRk5sY25acFkyVmZVMUJQVEU5R0lpd2lWaUk2SWpBdU1DNHdNREF3SWl3aVVDSTZJbGRwYmpNeUlpd2lRVTRpT2lKUGRHaGxjaUlzSWxkVUlqb3hNWDA9fDF8TDJOb1lYUnpMekU1T21GaU56bGlOV1ZoTFdVNVl6SXROR1l4TVMxaE16aGxMV000Tm1Oak9USTNZMk5sT1Y5bFlXVXlPVFppTWkwMFlqRmxMVFJoTVdRdFlUQmlZaTFoTVRZd01URmhPVGd3TmpaQWRXNXhMbWRpYkM1emNHRmpaWE12YldWemMyRm5aWE12TVRjMU56UTFNemN6TVRjME13PT18OTYyYWE2ZDdmNTZhNGE1YTNjMDcwOGRkZWZlOGNlMWZ8ZDU4NzVmNjI3OGUwNGU4Y2E5ZjUxNGM3NzE3ZTBhYWQ%3D&sdata=QlJkRWVIQVdLbGU3QWdVcEJENExja3FMQm1NQUZCK3BPaXpPOWFkZGJZdz0%3D&ovuser=b5e244bd-c492-495b-8b10-61bfd453e423%2Cefquinte%40bancolombia.com.co&OR=Teams-HL&CT=1757457468155&clickparams=eyJBcHBOYW1lIjoiVGVhbXMtRGVza3RvcCIsIkFwcFZlcnNpb24iOiI0OS8yNTA4MTUwMDcxNyIsIkhhc0ZlZGVyYXRlZFVzZXIiOmZhbHNlfQ%3D%3D", "#B85CCF"),
-        ("TABLERO HAs", "https://grupobancolombia.visualstudio.com/Vicepresidencia%20Servicios%20de%20Tecnología/_dashboards/dashboard/1f9264bd-fee1-48a1-bfd5-a8508c67acfb", "#C44141"),
+        ("GESTIONAR CAMBIOS TI", "https://bancolombia.sharepoint.com/sites/co-vsti/SitePages/sobre-nosotros_modelo-operativo_procesos_gestionar-cambios.aspx?xsdata=MDV8MDJ8fDdlNmJkODZkZDFiZDRiZDQ4YTgwMDhkZGVmZThjZTFmfGI1ZTI0NGJkYzQ5MjQ0NWI4YjEwNjFiZmQ0NTNlNDIzfDB8MHw2Mzg5MzA1MDUzMjYxMTU2Mjd8VW5rbm93bnxWR1ZoYlhOVFpXTjFjbWwwZVZObGNuWnBZMlY4ZXlKRFFTSTZJbFJsWVcxelgwRlVVRk5sY25acFkyVmZVMUJQVEU5R0lpd2lWaUk2SWpBdU1DNHdNREF3SWl3aVVDSTZJbGRwYmpNeUlpd2lRVTRpT2lKUGRHaGxjaUlzSWxkVUlqb3hNWDA9fDF8TDJOb1lYUnpMekU1T21GaU56bGlOV1ZoTFdVNVl6SXROR1l4TVMxaE16aGxMV000Tm1Oak9USTNZMk5sT1Y5bFlXVXlPVFppTWkwMFlqRmxMVFJoTVdRdFlUQmlZaTFoTVRZd01URmhPVGd3TmpaQWRXNXhMbWRpYkM1emNHRmpaWE12YldWemMyRm5aWE12TVRjMU56UTFNemN6TVRjME13PT18OTYyYWE2ZDdmNTZhNGE1YTNjMDcwOGRkZWZlOGNlMWZ8ZDU4NzVmNjI3OGUwNGU4Y2E5ZjUxNGM3NzE3ZTBhYWQ%3D&sdata=QlJkRWVIQVdLbGU3QWdVcEJENExja3FMQm1NQUZCK3BPaXpPOWFkZGJZdz0%3D&ovuser=b5e244bd-c492-495b-8b10-61bfd453e423%2Cefquinte%40bancolombia.com.co&OR=Teams-HL&CT=1757457468155&clickparams=eyJBcHBOYW1lIjoiVGVhbXMtRGVza3RvcCIsIkFwcFZlcnNpb24iOiI0OS8yNTA4MTUwMDcxNyIsIkhhc0ZlZGVlcmF0ZWRVc2VyIOmZhbHNlfQ%3D%3D", "#B85CCF"),
+        ("TABLERO HAs", "https://grupobancolombia.visualstudio.com/Vicepresidencia%20Servicios%20de%20Tecnolog%C3%ADa/_dashboards/dashboard/1f9264bd-fee1-48a1-bfd5-a8508c67acfb", "#C44141"),
         ("TABLERO CRQs", "https://bancolombia-ca1.onbmc.com/dashboards/d/b973b7b8-88f5-4201-a124-23f03094d644/tablero-cygnus?orgId=1271008613", "#C44141"),
         ("RESTRICCIÓN CAMBIOS", "https://bancolombia.sharepoint.com/:x:/r/sites/co-vsti/_layouts/15/Doc.aspx?sourcedoc=%7BDEC5F518-F360-4E63-99F6-8DA2FCA926DC%7D&file=Calendario%20Cambios%20Alto%20Impacto%20y%20Fechas%20Restricci%25u00f3n.xlsx&action=default&mobileredirect=true", "#D3DF68"),
         ("STAND BY", "https://bancolombia.sharepoint.com/sites/co-vsti/Lists/Programacin%20Stand%20By/IMes.aspx?viewid=ab3bc15f%2Dcce7%2D45c3%2D9eb4%2D319d54502d52&useFiltersInViewXml=1&OR=Teams%2DHL&CT=1706593136683&clickparams=eyJBcHBOYW1lIjoiVGVhbXMtRGVza3RvcCIsIkFwcFZlcnNpb24iOiI0OS8yMzExMzAyODcyNCIsIkhhc0ZlZGVyYXRlZFVzZXIiOmZhbHNlfQ%3D%3D", "#D3DF68")
