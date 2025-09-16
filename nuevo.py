@@ -42,7 +42,7 @@ def limpiar_texto(texto):
     Reemplaza caracteres especiales o no deseados, a menudo generados por la extracción
     de texto de PDFs, y se asegura de que el texto sea compatible con UTF-8.
     """
-    reemplazos = {' ': '', '\ue603': '', '\ue616': '', '\ue657': '', '\ue643': '', '\ue6a1': '', '\ue688': ''}
+    reemplazos = {'�': '', '\ue603': '', '\ue616': '', '\ue657': '', '\ue643': '', '\ue6a1': '', '\ue688': ''}
     for viejo, nuevo in reemplazos.items():
         texto = texto.replace(viejo, nuevo) # Itera sobre el diccionario y reemplaza los caracteres.
     return texto.encode('utf-8', 'ignore').decode('utf-8') # Codifica y decodifica para limpiar caracteres problemáticos.
@@ -452,8 +452,8 @@ def generar_comando_kubectl():
     ventanas_hijas.append(ventana_opciones)
     ventana_opciones.transient(root)
     ancho_nueva = 220
-    alto_nueva = 290
-    ventana_opciones.geometry(f"220x460+{nueva_x}+{y}")
+    alto_nueva = 490
+    ventana_opciones.geometry(f"230x470+{nueva_x}+{y}")
 
     ventana_opciones.configure(bg="#111111")
     frame_kubectl = tk.Frame(ventana_opciones, bg="#111111")
@@ -541,6 +541,7 @@ filter log like /(?i)error|failed/
 """
         mostrar_comando(query_conteo.strip(), "CloudWatch Conteo")
         
+    
     label_eks = tk.Label(frame_kubectl, text="EKS", bg="#111111", fg="white", font=("Arial", 12, "bold"))
     label_eks.grid(row=0, column=0, columnspan=2, pady=(0, 5), sticky="ew")
 
@@ -582,11 +583,28 @@ filter log like /(?i)error|failed/
     btn_logs.bind("<Leave>", on_leave)
 
 
+    # Inicio de la reubicación
+    # Frame para el título y los botones de CLUSTER
+    frame_cluster = tk.Frame(frame_kubectl, bg="#111111")
+    frame_cluster.grid(row=3, column=0, columnspan=2, pady=(0, 5), sticky="ew")
+    frame_cluster.columnconfigure(0, weight=1)
+    frame_cluster.columnconfigure(1, weight=1)
+    label_cluster = tk.Label(frame_cluster, text="CLUSTER", bg="#111111", fg="white", font=("Arial", 12, "bold"))
+    label_cluster.grid(row=0, column=0, columnspan=2, pady=0, sticky="ew")
+    btn_listar_cluster = tk.Button(frame_cluster, text="LISTAR", command=listar_cluster, height=1, width=13, bg="#E9E9E9", fg="black", font=("Arial", 10, "bold"), relief="solid", bd=2)
+    btn_listar_cluster.grid(row=1, column=0, padx=5, pady=(0, 5), sticky="ew")
+    btn_listar_cluster.bind("<Enter>", on_enter)
+    btn_listar_cluster.bind("<Leave>", on_leave)
+    btn_cluster = tk.Button(frame_cluster, text="INGRESAR", command=ingresar_a_cluster, height=1, width=13, bg="#E9E9E9", fg="black", font=("Arial", 10, "bold"), relief="solid", bd=2)
+    btn_cluster.grid(row=1, column=1, padx=5, pady=(0, 5), sticky="ew")
+    btn_cluster.bind("<Enter>", on_enter)
+    btn_cluster.bind("<Leave>", on_leave)
+    # Fin de la reubicación
 
 
     # Título de la sección
     label_deployment = tk.Label(frame_kubectl, text="DEPLOYMENT", bg="#111111", fg="white", font=("Arial", 12, "bold"))
-    label_deployment.grid(row=8, column=0, columnspan=2, pady=(20, 5), sticky="ew")
+    label_deployment.grid(row=8, column=0, columnspan=2, pady=(0, 5), sticky="ew")
     
     # Crear un frame contenedor para los botones
     frame_deployment = tk.Frame(frame_kubectl, bg="#111111")
@@ -621,7 +639,7 @@ filter log like /(?i)error|failed/
     
     # Título de la sección CONFIG MAP
     label_configmap = tk.Label(frame_kubectl, text="CONFIG MAP", bg="#111111", fg="white", font=("Arial", 12, "bold"))
-    label_configmap.grid(row=10, column=0, columnspan=2, pady=(20, 5), sticky="ew")
+    label_configmap.grid(row=10, column=0, columnspan=2, pady=(0, 5), sticky="ew")
     
     # Crear un frame contenedor para los botones
     frame_configmap = tk.Frame(frame_kubectl, bg="#111111")
@@ -660,7 +678,7 @@ filter log like /(?i)error|failed/
 
 
     label_cloudwatch = tk.Label(frame_kubectl, text="EKS LOGs INSIGHTS", bg="#111111", fg="white", font=("Arial", 12, "bold"))
-    label_cloudwatch.grid(row=12, column=0, columnspan=2, pady=(20, 5), sticky="ew")
+    label_cloudwatch.grid(row=12, column=0, columnspan=2, pady=(0, 5), sticky="ew")
     
     btn_logs_grep = tk.Button(frame_kubectl, text="LOGs GREP", command=generar_query_cloudwatch, bg="#E9E9E9", fg="black", font=("Arial", 10, "bold"))
     btn_logs_grep.grid(row=13, column=0, columnspan=2, padx=5, pady=(0, 5), sticky="ew")
@@ -723,7 +741,7 @@ def mostrar_script():
     ventana_script.title("MI BANCOLOMBIA")
     ventanas_hijas.append(ventana_script)
     ventana_script.transient(root)
-    ancho_nueva = 220
+    ancho_nueva = 230
     alto_nueva = 290
     ventana_script.geometry(f"{ancho_nueva}x{alto_nueva}+{nueva_x}+{y}")
     ventana_script.configure(bg="#111111")
@@ -740,7 +758,7 @@ def mostrar_script():
 # Configuración de la ventana principal
 root = tk.Tk()
 root.title("by PINKY")
-root.geometry("230x590")
+root.geometry("230x530")
 root.configure(bg="#111111")
 root.resizable(False, False)
 
@@ -807,22 +825,6 @@ btn_evento.pack(pady=(0, 5))  # ← sin padx y sin fill="x"
 btn_evento.bind("<Enter>", on_enter)
 btn_evento.bind("<Leave>", on_leave)
 
-# Frame para el título y los botones de CLUSTER
-frame_cluster = tk.Frame(root, bg="#111111")
-frame_cluster.pack(pady=5, fill="x")
-frame_cluster.columnconfigure(0, weight=1)
-frame_cluster.columnconfigure(1, weight=1)
-label_cluster = tk.Label(frame_cluster, text="CLUSTER", bg="#111111", fg="white", font=("Arial", 12, "bold"))
-label_cluster.grid(row=0, column=0, columnspan=2, pady=0, sticky="ew")
-btn_listar_cluster = tk.Button(frame_cluster, text="LISTAR", command=listar_cluster, height=1, width=13, bg="#E9E9E9", fg="black", font=("Arial", 10, "bold"), relief="solid", bd=2)
-btn_listar_cluster.grid(row=1, column=0, padx=5, pady=(0, 5), sticky="ew")
-btn_listar_cluster.bind("<Enter>", on_enter)
-btn_listar_cluster.bind("<Leave>", on_leave)
-btn_cluster = tk.Button(frame_cluster, text="INGRESAR", command=ingresar_a_cluster, height=1, width=13, bg="#E9E9E9", fg="black", font=("Arial", 10, "bold"), relief="solid", bd=2)
-btn_cluster.grid(row=1, column=1, padx=5, pady=(0, 5), sticky="ew")
-btn_cluster.bind("<Enter>", on_enter)
-btn_cluster.bind("<Leave>", on_leave)
-
 # Frame para el título y el botón de KUBECTL
 frame_kubectl = tk.Frame(root, bg="#111111") #
 frame_kubectl.pack(pady=5, fill="x", padx=20)  # ← nuevo
@@ -879,7 +881,7 @@ subframe_botones_contactos = tk.Frame(frame_contactos, bg="#111111")
 subframe_botones_contactos.grid(row=1, column=0, columnspan=2, pady=(0, 5))
 
 btn_tel = tk.Button(subframe_botones_contactos, text="TEL", command=mostrar_telefonos,
-                    width=12, bg="#E9E9E9", fg="black", font=("Arial", 10, "bold"),
+                    width=10, bg="#E9E9E9", fg="black", font=("Arial", 10, "bold"),
                     relief="solid", bd=2)
 btn_tel.pack(side=tk.LEFT, padx=5)
 btn_tel.bind("<Enter>", on_enter)
@@ -965,7 +967,7 @@ contactos_nuestros = sorted([
 # Botón NUESTROS
 
 btn_nuestros = tk.Button(subframe_botones_contactos, text="NUESTROS", command=mostrar_nuestros,
-                         width=12, bg="#E9E9E9", fg="black", font=("Arial", 10, "bold"),
+                         width=10, bg="#E9E9E9", fg="black", font=("Arial", 10, "bold"),
                          relief="solid", bd=2)
 btn_nuestros.pack(side=tk.LEFT, padx=5)
 btn_nuestros.bind("<Enter>", on_enter)
@@ -1092,7 +1094,7 @@ def imagen_clicada(event):
     ventana_botones.title("Enlaces Cygnus")
     ventanas_hijas.append(ventana_botones)
     ventana_botones.transient(root)
-    ventana_botones.geometry(f"228x590+{nueva_x}+{y}")
+    ventana_botones.geometry(f"228x530+{nueva_x}+{y}")
     ventana_botones.configure(bg="#111111")
     ventana_botones.resizable(False, False)
 
@@ -1146,8 +1148,9 @@ def imagen_clicada(event):
         ("PROGRAMACIÓN HAPPY FRIDAY", "https://bancolombia.sharepoint.com/:x:/r/teams/Cygnus-AWS/_layouts/15/Doc.aspx?sourcedoc=%7B7B333C20-3584-4D0B-ACFA-00CDB1263EBE%7D&file=HAPPY%20FRIDAY%20Y%20CUMPLEA%C3%91OS%20CYGNUS.xlsx&action=default&mobileredirect=true", "#CCB363"),
         ("REPORTE HAPPY", "https://bancolombia.sharepoint.com.mcas.ms/sites/CO-VGH/SitePages/mis-beneficios-a-tiempo.aspx", "#CCB363"),
         ("CYGNUS HOME", "https://bancolombia.sharepoint.com/teams/Cygnus-AWS/SitePages/TrainingHome.aspx", "#CCB363"),
-        ("CARPETA CYGNUS ONE DRIVE", "https://bancolombia.sharepoint.com/teams/PlataformasyDisponibilidaddeTI/Documentos%20compartidos/Forms/AllItems.aspx?id=%2Fteams%2FPlataformasyDisponibilidaddeTI%2FDocumentos%20compartidos%2FGeneral%2F02%2E%20Areas%2FIntegrada%C2%A0Operaci%C3%B3n%20TI%202%2FCYGNUS&viewid=57766697%2D4feb%2D4155%2Daa50%2D7e170cf7663f&csf=1&web=1&e=EkAc8b&FolderCTID=0x0120005E9D7AC01B2F224C9592BE475FCCCF12", "#CCB363"),
+        ("CARPETA CYGNUS ONE DRIVE", "https://bancolombia.sharepoint.com/teams/PlataformasyDisponibilidaddeTI/Documentos%20compartidos/Forms/AllItems.aspx?id=%2Fteams%2FPlataformasyDisponibilidaddeTI%2FDocumentos%20compartidos%2FGeneral%2F02%2E%20Areas%2FIntegrada%C2%A0Operaci%C3%B3n%20TI%2F2FCYGNUS&viewid=57766697%2D4feb%2D4155%2Daa50%2D7e170cf7663f&csf=1&web=1&e=EkAc8b&FolderCTID=0x0120005E9D7AC01B2F224C9592BE475FCCCF12", "#CCB363"),
         ("CONECTADOS", "https://performancemanager8.successfactors.com/sf/start?_s.crb=aXY4tvGvZ%252bhWEJ65r%252bfyKs1XnEaUsD71QXK3e6RrN%252f8%253d", "#CCB363"),
+        ("DIRECTORIO ACTIVO", "https://apps.powerapps.com/play/e/6bdfe354-f250-e0e7-941d-103fc5c5001d/a/903ea87a-6b3a-4311-b962-f96b75e674d6?tenantId=b5e244bd-c492-495b-8b10-61bfd453e423&amp;hint=8bd66a5b-a6b7-43c4-8bdb-7d71972150ca&amp;sourcetime=1757015480085&source=teamsLinkUnfurling", "#B85CCF"),
         ("PORTAL CONTINUIDAD TI", "https://apps.powerapps.com/play/e/6bdfe354-f250-e0e7-941d-103fc5c5001d/a/913bb453-3222-4666-be40-dd026f570605?tenantId=b5e244bd-c492-495b-8b10-61bfd453e423", "#B85CCF"),
         ("PIPELINES", "https://bancolombia-is.onbmc.com/helix/index.html#/Autogestionados.Bancolombia/view/Autogestionados.Bancolombia:Servicios%20autogestionados", "#B85CCF"),
         ("GESTIONAR CAMBIOS TI", "https://bancolombia.sharepoint.com/sites/co-vsti/SitePages/sobre-nosotros_modelo-operativo_procesos_gestionar-cambios.aspx?xsdata=MDV8MDJ8fDdlNmJkODZkZDFiZDRiZDQ4YTgwMDhkZGVmZThjZTFmfGI1ZTI0NGJkYzQ5MjQ0NWI4YjEwNjFiZmQ0NTNlNDIzfDB8MHw2Mzg5MzA1MDUzMjYxMTU2Mjd8VW5rbm93bnxWR1ZoYlhOVFpXTjFjbWwwZVZObGNuWnBZMlY4ZXlKRFFTSTZJbFJsWVcxelgwRlVVRk5sY25acFkyVmZVMUJQVEU5R0lpd2lWaUk2SWpBdU1DNHdNREF3SWl3aVVDSTZJbGRwYmpNeUlpd2lRVTRpT2lKUGRHaGxjaUlzSWxkVUlqb3hNWDA9fDF8TDJOb1lYUnpMekU1T21GaU56bGlOV1ZoTFdVNVl6SXROR1l4TVMxaE16aGxMV000Tm1Oak9USTNZMk5sT1Y5bFlXVXlPVFppTWkwMFlqRmxMVFJoTVdRdFlUQmlZaTFoTVRZd01URmhPVGd3TmpaQWRXNXhMbWRpYkM1emNHRmpaWE12YldWemMyRm5aWE12TVRjMU56UTFNemN6TVRjME13PT18OTYyYWE2ZDdmNTZhNGE1YTNjMDcwOGRkZWZlOGNlMWZ8ZDU4NzVmNjI3OGUwNGU4Y2E5ZjUxNGM3NzE3ZTBhYWQ%3D&sdata=QlJkRWVIQVdLbGU3QWdVcEJENExja3FMQm1NQUZCK3BPaXpPOWFkZGJZdz0%3D&ovuser=b5e244bd-c492-495b-8b10-61bfd453e423%2Cefquinte%40bancolombia.com.co&OR=Teams-HL&CT=1757457468155&clickparams=eyJBcHBOYW1lIjoiVGVhbXMtRGVza3RvcCIsIkFwcFZlcnNpb24iOiI0OS8yNTA4MTUwMDcxNyIsIkhhc0ZlZGVyYXRlZFVzZXIiOmZhbHNlfQ%3D%3D", "#B85CCF"),
