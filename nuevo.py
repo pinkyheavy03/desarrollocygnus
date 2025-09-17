@@ -179,6 +179,53 @@ def generar_evento_incidente():
     } # Crea un diccionario con los datos a llenar.
     llenar_plantilla(datos, plantilla_path, salida_path) # Llama a la función para llenar la plantilla.
 
+# Esta es la función corregida.
+def generar_respuesta_ciber():
+    """
+    Genera y copia al portapapeles una respuesta estándar para ciberseguridad.
+    """
+    id_ingresado = simpledialog.askstring("ID de la CRQ", "Ingresa el ID de la CRQ o ID que corresponda:")
+    if id_ingresado:
+        frase = f"Cordial saludo, se revela para validaciones sobre el ID: {id_ingresado}"
+        # La función 'copiar_comando' ya muestra el mensaje.
+        # Por eso, aquí solo la llamamos, sin duplicar la notificación.
+        copiar_comando(frase) 
+    else:
+        messagebox.showwarning("Aviso", "No se ingresó ningún ID. No se copió nada al portapapeles.")
+
+def generar_ha_info():
+    """
+    Genera y copia al portapapeles la información del proceso de cambio en Helix.
+    """
+    # El texto completo para copiar, con formato.
+    texto = """PARA Ambientes Productivos se crea así:
+
+1// En Helix crear una Petición de Cambio usando la plantilla (Template):
+Cambio en Produccion.Manual.Estandar.Administrativo_Nube AWS - GIOTI.Riesgo =1
+ 
+
+2// **IMPORTANTE** !!Llenar la información obligatoria en el apartado de descripción
+
+3// Seleccionar el "Grupo coordinador de cambios" (Change coordinator group: El grupo y quien solicita el proceso)
+
+y
+
+Seleccionar el "Grupo de gestores de cambios" (Change manager group: El grupo que realiza el proceso): en este caso
+OC INTEGRADA OPERACION TI 2 CYGNUS APROBADORES CAMBIOS TI
+
+4// **IMPORTANTE** !! ... Editar las "Fechas programadas" y no tocar las "Fechas reales"
+ 
+5// Guardar la Petición de Cambio, acá no termina todo
+ 
+6// **IMPORTANTE** !! Luego cambiar estado de Borrador a "Programado para aprobación"
+
+
+Muchas Gracias.
+"""
+    # Llama a la función que ya existe para copiar el texto al portapapeles
+    # y mostrar el mensaje de confirmación.
+    copiar_comando(texto)
+
 def llenar_plantilla(datos, plantilla_path, salida_path):
     """
     Llena una plantilla de Word con los datos extraídos.
@@ -422,7 +469,7 @@ def mostrar_comando(comando, titulo):
     
     boton_copiar = tk.Button(ventana_comando, text="Copiar al portapapeles", command=copiar_al_portapapeles,
                              bg="#E9E9E9", fg="black", font=("Arial", 10, "bold"), relief="raised")
-    boton_copiar.pack(pady=5)
+    boton_copiar.pack(pady=1)
 
 def copiar_comando(comando):
     """Copia un comando al portapapeles y muestra un mensaje de confirmación."""
@@ -461,7 +508,7 @@ def generar_comando_kubectl():
     ventana_opciones.geometry(f"{VENTANA_SECUNDARIA_ANCHO}x{VENTANA_SECUNDARIA_ALTO}+{nueva_x}+{y}")
     ventana_opciones.configure(bg="#111111")
     frame_kubectl = tk.Frame(ventana_opciones, bg="#111111")
-    frame_kubectl.pack(pady=5, fill="x", padx=20)
+    frame_kubectl.pack(pady=1, fill="x", padx=20)
     frame_kubectl.columnconfigure(0, weight=1)
     frame_kubectl.columnconfigure(1, weight=1)
 
@@ -551,7 +598,7 @@ filter log like /(?i)error|failed/
 
     # 🔹 PODs LIVE y TOP POD
     frame_pods = tk.Frame(frame_kubectl, bg="#111111")
-    frame_pods.grid(row=1, column=0, columnspan=2, pady=5, sticky="ew")
+    frame_pods.grid(row=1, column=0, columnspan=2, pady=1, sticky="ew")
     frame_pods.columnconfigure(0, weight=1)
     frame_pods.columnconfigure(1, weight=1)
 
@@ -570,7 +617,7 @@ filter log like /(?i)error|failed/
 
     # 🔹 Eliminar PODs y LOGs
     frame_pods_logs = tk.Frame(frame_kubectl, bg="#111111")
-    frame_pods_logs.grid(row=2, column=0, columnspan=2, pady=5, sticky="ew")
+    frame_pods_logs.grid(row=2, column=0, columnspan=2, pady=1, sticky="ew")
     frame_pods_logs.columnconfigure(0, weight=1)
     frame_pods_logs.columnconfigure(1, weight=1)
 
@@ -590,7 +637,7 @@ filter log like /(?i)error|failed/
     # Inicio de la reubicación
     # Frame para el título y los botones de CLUSTER
     frame_cluster = tk.Frame(frame_kubectl, bg="#111111")
-    frame_cluster.grid(row=3, column=0, columnspan=2, pady=5, sticky="ew")
+    frame_cluster.grid(row=3, column=0, columnspan=2, pady=1, sticky="ew")
     frame_cluster.columnconfigure(0, weight=1)
     frame_cluster.columnconfigure(1, weight=1)
     label_cluster = tk.Label(frame_cluster, text="CLUSTER", bg="#111111", fg="white", font=("Arial", 12, "bold"))
@@ -608,11 +655,11 @@ filter log like /(?i)error|failed/
 
     # Título de la sección
     label_deployment = tk.Label(frame_kubectl, text="DEPLOYMENT", bg="#111111", fg="white", font=("Arial", 12, "bold"))
-    label_deployment.grid(row=8, column=0, columnspan=2, pady=5, sticky="ew")
+    label_deployment.grid(row=8, column=0, columnspan=2, pady=1, sticky="ew")
     
     # Crear un frame contenedor para los botones
     frame_deployment = tk.Frame(frame_kubectl, bg="#111111")
-    frame_deployment.grid(row=9, column=0, columnspan=2, pady=5, sticky="ew")
+    frame_deployment.grid(row=9, column=0, columnspan=2, pady=1, sticky="ew")
     frame_deployment.columnconfigure(0, weight=1)
     frame_deployment.columnconfigure(1, weight=1)
     
@@ -643,11 +690,11 @@ filter log like /(?i)error|failed/
     
     # Título de la sección CONFIG MAP
     label_configmap = tk.Label(frame_kubectl, text="CONFIG MAP", bg="#111111", fg="white", font=("Arial", 12, "bold"))
-    label_configmap.grid(row=10, column=0, columnspan=2, pady=5, sticky="ew")
+    label_configmap.grid(row=10, column=0, columnspan=2, pady=1, sticky="ew")
     
     # Crear un frame contenedor para los botones
     frame_configmap = tk.Frame(frame_kubectl, bg="#111111")
-    frame_configmap.grid(row=11, column=0, columnspan=2, pady=5, sticky="ew")
+    frame_configmap.grid(row=11, column=0, columnspan=2, pady=1, sticky="ew")
     frame_configmap.columnconfigure(0, weight=1)
     frame_configmap.columnconfigure(1, weight=1)
     
@@ -696,7 +743,7 @@ filter log like /(?i)error|failed/
     
     # Crear un frame contenedor centrado en el grid
     frame_cmds = tk.Frame(frame_kubectl, bg="#111111")
-    frame_cmds.grid(row=15, column=0, columnspan=2, pady=5, sticky="ew")
+    frame_cmds.grid(row=15, column=0, columnspan=2, pady=1, sticky="ew")
 
     # Centrar el contenido dentro del frame
     frame_cmds.columnconfigure(0, weight=1)
@@ -753,7 +800,7 @@ def mostrar_script():
     for text in button_texts:
         btn = tk.Button(frame_script, text=text, command=lambda t="~/Documents/goku": copiar_script(t), #
                         height=BUTTON_HEIGHT, bg="#E9E9E9", fg="black", font=("Arial", 10, "bold"), relief="solid", bd=2)
-        btn.pack(pady=5, fill="x")
+        btn.pack(pady=1, fill="x")
         btn.bind("<Enter>", on_enter)
         btn.bind("<Leave>", on_leave)
 
@@ -789,11 +836,11 @@ style.configure("TButton", background="white", foreground="black", font=("Arial"
 
 # Frame para el título y los botones de DOCUMENTACIÓN CYGNUS
 frame_documentacion = tk.Frame(root, bg="#111111")
-frame_documentacion.pack(pady=10)
+frame_documentacion.pack(pady=7)
 label_titulo = tk.Label(frame_documentacion, text="DOCUMENTACIÓN", bg="#111111", fg="white", font=("Arial", 12, "bold"))
-label_titulo.pack(pady=5)
+label_titulo.pack(pady=1)
 frame_botones_doc = tk.Frame(frame_documentacion, bg="#111111")
-frame_botones_doc.pack(pady=5)
+frame_botones_doc.pack(pady=1)
 btn_crq = tk.Button(frame_botones_doc, text="CRQ", command=iniciar_proceso_crq, height=BUTTON_HEIGHT, bg="#E9E9E9", fg="black", font=("Arial", 10, "bold"), relief="solid", bd=2)
 btn_crq.pack(side=tk.LEFT, padx=5)
 btn_crq.bind("<Enter>", on_enter)
@@ -807,15 +854,16 @@ btn_pods.pack(side=tk.LEFT, padx=5)
 btn_pods.bind("<Enter>", on_enter)
 btn_pods.bind("<Leave>", on_leave)
 
-# Botón de Evento/Incidente en un frame separado para su propia fila
+# Botón de Evento/Incidente y el nuevo botón en un mismo frame
 frame_evento = tk.Frame(root, bg="#111111")
-frame_evento.pack(pady=5)
+frame_evento.pack(pady=1)
 
+# Botón de Evento/Incidente
 btn_evento = tk.Button(
     frame_evento,
     text="EVENTO / INCIDENTE",
     command=generar_evento_incidente,
-    width=20,
+    width=18,
     bg="#E9E9E9",
     fg="black",
     font=("Arial", 10, "bold"),
@@ -823,17 +871,49 @@ btn_evento = tk.Button(
     bd=2,
     height=BUTTON_HEIGHT
 )
-
-btn_evento.pack(pady=0)
+btn_evento.pack(pady=1)
 btn_evento.bind("<Enter>", on_enter)
 btn_evento.bind("<Leave>", on_leave)
 
+# Nuevo botón "RESPUESTA CIBER"
+btn_respuesta_ciber = tk.Button(
+    frame_evento,
+    text="SECRETOS",
+    command=generar_respuesta_ciber,
+    width=11,
+    bg="#E9E9E9",
+    fg="black",
+    font=("Arial", 10, "bold"),
+    relief="solid",
+    bd=2,
+    height=BUTTON_HEIGHT
+)
+btn_respuesta_ciber.pack(pady=1)
+btn_respuesta_ciber.bind("<Enter>", on_enter)
+btn_respuesta_ciber.bind("<Leave>", on_leave)
+
+btn_ha_info = tk.Button(
+    frame_evento, # Asegúrate de que este es el 'frame' correcto donde quieres que aparezca el botón
+    text="HA INFO",
+    command=generar_ha_info,
+    width=11,
+    bg="#E9E9E9",
+    fg="black",
+    font=("Arial", 10, "bold"),
+    relief="solid",
+    bd=2,
+    height=BUTTON_HEIGHT
+)
+btn_ha_info.pack(pady=1)
+btn_ha_info.bind("<Enter>", on_enter)
+btn_ha_info.bind("<Leave>", on_leave)
+
 # Frame para el título y el botón de KUBECTL
 frame_kubectl = tk.Frame(root, bg="#111111")
-frame_kubectl.pack(pady=5, fill="x", padx=20)
+frame_kubectl.pack(pady=1, fill="x", padx=20)
 frame_kubectl.columnconfigure(0, weight=1)
 label_kubectl = tk.Label(frame_kubectl, text="KUBECTL", bg="#111111", fg="white", font=("Arial", 12, "bold"))
-label_kubectl.grid(row=0, column=0, pady=5, sticky="ew")
+label_kubectl.grid(row=0, column=0, pady=7, sticky="ew")
 
 btn_kubectl = tk.Button(
     frame_kubectl,
@@ -848,7 +928,7 @@ btn_kubectl = tk.Button(
     bd=2
 )
 
-btn_kubectl.grid(row=1, column=0, padx=10, pady=5, sticky="ew")
+btn_kubectl.grid(row=1, column=0, padx=10, pady=0, sticky="ew")
 btn_kubectl.bind("<Enter>", on_enter)
 btn_kubectl.bind("<Leave>", on_leave)
 
@@ -857,30 +937,30 @@ btn_script = tk.Button(
     text="SCRIPTS",  # Mayúsculas para consistencia
     command=mostrar_script,
     height=BUTTON_HEIGHT,
-    width=20,
+    width=14,
     bg="#E9E9E9",
     fg="black",
     font=("Arial", 10, "bold"),
     relief="solid",
     bd=2
 )
-btn_script.grid(row=2, column=0, padx=40, pady=5, sticky="ew")
+btn_script.grid(row=2, column=0, padx=40, pady=1, sticky="ew")
 btn_script.bind("<Enter>", on_enter)
 btn_script.bind("<Leave>", on_leave)
 
 # Frame para el título y los botones de CONTACTOS
 frame_contactos = tk.Frame(root, bg="#111111")
-frame_contactos.pack(pady=5, fill="x")
+frame_contactos.pack(pady=0, fill="x")
 frame_contactos.columnconfigure(0, weight=1)
 frame_contactos.columnconfigure(1, weight=1)
 label_contactos = tk.Label(frame_contactos, text="CONTACTOS", bg="#111111", fg="white", font=("Arial", 12, "bold"))
-label_contactos.grid(row=0, column=0, columnspan=2, pady=5, sticky="ew")
+label_contactos.grid(row=0, column=0, columnspan=2, pady=7, sticky="ew")
 
 
 
 # Sub-frame centrado para los botones TEL y NUESTROS
 subframe_botones_contactos = tk.Frame(frame_contactos, bg="#111111")
-subframe_botones_contactos.grid(row=1, column=0, columnspan=2, pady=(0, 5))
+subframe_botones_contactos.grid(row=1, column=0, columnspan=2, pady=(0, 2))
 
 btn_tel = tk.Button(subframe_botones_contactos, text="TEL", command=mostrar_telefonos,
                     width=5, bg="#E9E9E9", fg="black", font=("Arial", 10, "bold"),
@@ -969,7 +1049,7 @@ contactos_nuestros = sorted([
 # Botón NUESTROS
 
 btn_nuestros = tk.Button(subframe_botones_contactos, text="NUESTROS", command=mostrar_nuestros,
-                         width=8, bg="#E9E9E9", fg="black", font=("Arial", 10, "bold"),
+                         width=11, bg="#E9E9E9", fg="black", font=("Arial", 10, "bold"),
                          relief="solid", bd=2, height=BUTTON_HEIGHT)
 btn_nuestros.pack(side=tk.LEFT, padx=5)
 btn_nuestros.bind("<Enter>", on_enter)
@@ -980,9 +1060,9 @@ btn_nuestros.bind("<Leave>", on_leave)
 
 # Frame para el título y los botones de PRESENTACIÓN TURNOS
 frame_turnos = tk.Frame(root, bg="#111111")
-frame_turnos.pack(pady=5, fill="x")
+frame_turnos.pack(pady=1, fill="x")
 label_turnos = tk.Label(frame_turnos, text="PRESENTACIÓN TURNOS", bg="#111111", fg="white", font=("Arial", 12, "bold"))
-label_turnos.pack(pady=5)
+label_turnos.pack(pady=7)
 
 # Lista de integrantes
 integrantes = [
@@ -1064,11 +1144,11 @@ def seleccionar_integrantes(turno):
 
     # Listbox para seleccionar los nombres
     label_original = tk.Label(frame_contenido, text="1. Selecciona los integrantes:", bg="#111111", fg="white", font=("Arial", 10, "bold"))
-    label_original.pack(pady=5)
+    label_original.pack(pady=1)
     listbox_original = tk.Listbox(frame_contenido, selectmode=tk.MULTIPLE, bg="#E9E9E9", fg="black", font=("Arial", 10), height=7)
     for nombre in integrantes:
         listbox_original.insert(tk.END, nombre)
-    listbox_original.pack(fill="x", padx=10, pady=5)
+    listbox_original.pack(fill="x", padx=10, pady=1)
     
     def pasar_seleccion():
         seleccionados = [listbox_original.get(i) for i in listbox_original.curselection()]
@@ -1083,17 +1163,17 @@ def seleccionar_integrantes(turno):
             
     # Botón para pasar la selección
     btn_pasar = tk.Button(frame_contenido, text="Añadir >>", command=pasar_seleccion, bg="#E9E9E9", fg="black", font=("Arial", 10, "bold"), height=BUTTON_HEIGHT)
-    btn_pasar.pack(pady=5)
+    btn_pasar.pack(pady=1)
 
     # Listbox para los nombres seleccionados y reordenables
     label_seleccionados = tk.Label(frame_contenido, text="2. Reordena la lista (si es necesario):", bg="#111111", fg="white", font=("Arial", 10, "bold"))
-    label_seleccionados.pack(pady=5)
+    label_seleccionados.pack(pady=1)
     listbox_seleccionados = tk.Listbox(frame_contenido, selectmode=tk.SINGLE, bg="#E9E9E9", fg="black", font=("Arial", 10), height=7)
-    listbox_seleccionados.pack(fill="x", padx=10, pady=5)
+    listbox_seleccionados.pack(fill="x", padx=10, pady=1)
 
     # Botones de subir y bajar
     frame_mover = tk.Frame(frame_contenido, bg="#111111")
-    frame_mover.pack(pady=5)
+    frame_mover.pack(pady=1)
     btn_subir = tk.Button(frame_mover, text="▲ Subir", command=mover_arriba, bg="#E9E9E9", fg="black", font=("Arial", 9, "bold"), height=BUTTON_HEIGHT)
     btn_subir.pack(side=tk.LEFT, padx=5)
     btn_bajar = tk.Button(frame_mover, text="▼ Bajar", command=mover_abajo, bg="#E9E9E9", fg="black", font=("Arial", 9, "bold"), height=BUTTON_HEIGHT)
@@ -1101,12 +1181,12 @@ def seleccionar_integrantes(turno):
 
     # Botón final para confirmar
     btn_confirmar = tk.Button(frame_contenido, text="3. Generar", command=confirmar_seleccion, bg="#E9E9E9", fg="black", font=("Arial", 10, "bold"), height=BUTTON_HEIGHT)
-    btn_confirmar.pack(pady=20)
+    btn_confirmar.pack(pady=10)
 
 
 # Botones de turnos
 frame_botones_turnos = tk.Frame(frame_turnos, bg="#111111")
-frame_botones_turnos.pack(pady=5)
+frame_botones_turnos.pack(pady=1)
 for turno in ["6-2", "2-10", "10-6"]:
     btn = tk.Button(frame_botones_turnos, text=turno, command=lambda t=turno: seleccionar_integrantes(t),
                     height=BUTTON_HEIGHT, bg="#E9E9E9", fg="black", font=("Arial", 10, "bold"), relief="solid", bd=2, width=6)
@@ -1116,7 +1196,7 @@ for turno in ["6-2", "2-10", "10-6"]:
 
 
 frame_img = tk.Frame(root, bg="black")
-frame_img.pack(pady=5)
+frame_img.pack(pady=1)
 def abrir_url(url):
     """Abre la URL dada en una nueva ventana del navegador."""
     try:
