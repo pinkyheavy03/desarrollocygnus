@@ -12,9 +12,12 @@ import webbrowser # Importa la librería webbrowser para abrir URL's en el naveg
 from tkinter import font # Importa la clase font para trabajar con fuentes en Tkinter.
 import time
 from tkinter import ttk
+from customtkinter import CTkLabel, CTkImage
+from customtkinter import CTkTextbox  # Este import debe ir al inicio del archivo
 
 
-
+ctk.set_appearance_mode("dark")
+ctk.set_default_color_theme("blue")
 # Ruta de la imagen/logo
 
 def obtener_ruta_recurso(nombre_archivo):
@@ -34,18 +37,17 @@ def obtener_ruta_recurso(nombre_archivo):
 ruta_logo = obtener_ruta_recurso("cygnusCARGA.png")
 
 def mostrar_ventana_carga():
-    ventana_carga = tk.Tk()
+    ventana_carga = ctk.CTk()
     ventana_carga.title("By Pinky")
     ventana_carga.geometry("230x250")
-    ventana_carga.configure(bg="black")
     ventana_carga.resizable(False, False)
 
     # Texto principal
-    label_texto = tk.Label(
+    label_texto = ctk.CTkLabel(
         ventana_carga,
         text="APP CYGNUS",
-        fg="white",
-        bg="black",
+
+
         font=("Comic Sans MS", 19, "bold"),
         anchor="center",
         justify="center"
@@ -53,16 +55,21 @@ def mostrar_ventana_carga():
     label_texto.pack(pady=(13, 5))  # Más espacio arriba # antes era (10, 5)
 
         # Imagen/logo
+
     if os.path.exists(ruta_logo):
         img = Image.open(ruta_logo)
         img = img.resize((100, 100), Image.Resampling.LANCZOS)
-        img_tk = ctk.CTkImage(light_image=img, dark_image=img, size=(100, 100))
-        label_img = tk.Label(ventana_carga, image=img_tk, bg="black")
-        label_img.image = img_tk
-        label_img.pack(pady=(5, 5))  # 20 píxeles arriba, 5 abajo
+
+        # Crear imagen compatible con CTk
+        img_ctk = CTkImage(light_image=img, dark_image=img, size=(100, 100))
+
+        # Usar CTkLabel en lugar de ctk.CTkLabel
+        label_img = CTkLabel(ventana_carga, image=img_ctk, text="", fg_color="black")
+        label_img.pack(pady=(5, 5))
+
 
     # Texto dinámico
-    label_dinamico = tk.Label(ventana_carga, text="Inicializando módulos...", fg="gray", bg="black", font=("Arial", 11))
+    label_dinamico = ctk.CTkLabel(ventana_carga, text="Inicializando módulos...", font=("Arial", 11))
     label_dinamico.pack(pady=(5, 5))
 
     # Barra de progreso
@@ -270,15 +277,15 @@ def mostrar_mongo():
     ancho_principal = root.winfo_width()
     nueva_x = x + ancho_principal
 
-    ventana_mongo = tk.Toplevel(root)
+    ventana_mongo = ctk.CTkToplevel(root)
     ventana_mongo.title("EXTENSIONES MONGO")
     ventana_mongo.geometry(f"230x140+{nueva_x}+{y}")
-    ventana_mongo.configure(bg="black")
+    ventana_mongo.configure(fg_color="black")  # ← Aquí se cierra correctamente
     ventanas_hijas.append(ventana_mongo)
     ventana_mongo.transient(root)
 
-    label_titulo = tk.Label(ventana_mongo, text="EXTENSIONES", bg="black", fg="white", font=("Arial", 12, "bold"))
-    label_titulo.pack(pady=10)
+    label_titulo = ctk.CTkLabel(ventana_mongo, text="EXTENSIONES", font=("Arial", 12, "bold"))
+    label_titulo.pack(pady=5)
 
     comando_validar = """aws cloudformation list-types --visibility PUBLIC --region us-east-1 | jq '.TypeSummaries[] | select(.TypeName == "MongoDB::Atlas::APIKey" or 
   .TypeName == "MongoDB::Atlas::AccessListAPIKey" or 
@@ -342,12 +349,12 @@ def mostrar_mongo():
             comandos.append(comando)
 
         mostrar_comando("\\n\\n".join(comandos), "Activar MONGO")
-    btn_validar = tk.Button(
+    btn_validar = ctk.CTkButton(
         ventana_mongo,
         text="VALIDAR",
         command=lambda: copiar_comando_mongo(comando_validar),
-        bg="#E9E9E9",
-        fg="black",
+
+
         font=("Arial", 10, "bold"),
         width=9
     )
@@ -355,12 +362,12 @@ def mostrar_mongo():
     btn_validar.bind("<Enter>", on_enter)
     btn_validar.bind("<Leave>", on_leave)
 
-    btn_activar = tk.Button(
+    btn_activar = ctk.CTkButton(
         ventana_mongo,
         text="ACTIVAR",
         command=activar_mongo,
-        bg="#E9E9E9",
-        fg="black",
+
+
         font=("Arial", 10, "bold"),
         width=9
     )
@@ -477,28 +484,31 @@ def iniciar_proceso_pods():
     llenar_plantilla(datos, plantilla_path, salida_path)
 
 # Funciones de hover
+# Función: al pasar el mouse por encima
 def on_enter(event):
     """Cambia el color de fondo de un widget al pasar el mouse por encima."""
     widget = event.widget
-    # Guarda el color original si no está guardado
-    if not hasattr(widget, 'original_bg'):
-        widget.original_bg = widget.cget("bg")
-    widget.configure(bg="#9C9C9C")  # dorado
+    if not hasattr(widget, 'original_fg_color'):
+        widget.original_fg_color = widget.cget("fg_color")
+    widget.configure(fg_color="#9C9C9C")  # color dorado
 
+# Función: al salir el mouse
 def on_leave(event):
     """Restaura el color de fondo de un widget al salir el mouse."""
     widget = event.widget
-    # Restaura el color original si está guardado
-    if hasattr(widget, 'original_bg'):
-        widget.configure(bg=widget.original_bg)
+    if hasattr(widget, 'original_fg_color'):
+        widget.configure(fg_color=widget.original_fg_color)
 
+# Función: hover sobre imagen
 def on_enter_image(event):
     """Cambia el color del borde de una imagen al pasar el mouse por encima."""
-    event.widget.configure(highlightbackground="white")
+    event.widget.configure(border_color="white")
 
+# Función: salir del hover sobre imagen
 def on_leave_image(event):
     """Restaura el color del borde de una imagen al salir el mouse."""
-    event.widget.configure(highlightbackground="gray")
+    event.widget.configure(border_color="gray")
+
 
 
 def mostrar_telefonos():
@@ -516,35 +526,31 @@ def mostrar_telefonos():
     # Verificar si la ventana ya está abierta
     for ventana in ventanas_hijas:
         if ventana.winfo_exists() and ventana.title() == "Contactos Telefónicos":
-            # Reposicionar la ventana
-            ventana.geometry(f"+{nueva_x}+{y}") #
-            # Enfocarla
+            ventana.geometry(f"+{nueva_x}+{y}")
             ventana.lift()
             ventana.focus_force()
             return
             
     # Si no existe, crear una nueva ventana
-    ventana_tel = tk.Toplevel(root) # Crea una nueva ventana de nivel superior.
+    ventana_tel = ctk.CTkToplevel(root)
     ventana_tel.title("Contactos Telefónicos")
     ventanas_hijas.append(ventana_tel)
-    
-    # Hacemos la ventana secundaria transitoria de la principal
     ventana_tel.transient(root)
     
-    # La nueva ventana aparecerá a la derecha de la principal
+    # Posición y tamaño
     ancho_nueva = 510
     alto_nueva = 400
     ventana_tel.geometry(f"{ancho_nueva}x{alto_nueva}+{nueva_x}+{y}")
-    ventana_tel.configure(bg="black")
-    
+    ventana_tel.configure(fg_color="black")  # Estilo visual compatible con CTk
+
+    # Tabla de contactos
     columnas = ("Nombre", "Correo", "Teléfono")
-    tabla = ttk.Treeview(ventana_tel, columns=columnas, show="headings") # Crea el widget de tabla.
-    tabla.pack(expand=True, fill="both", padx=10, pady=10)
-  
-    for col in columnas:        
-        tabla.column("Nombre", anchor="w", width=140)
-        tabla.column("Correo", anchor="w", width=140)
-        tabla.column("Teléfono", anchor="w", width=40)
+    tabla = ttk.Treeview(ventana_tel, columns=columnas, show="headings")
+    tabla.pack(expand=True, fill="both", padx=10, pady=5)
+
+    tabla.column("Nombre", anchor="w", width=140)
+    tabla.column("Correo", anchor="w", width=140)
+    tabla.column("Teléfono", anchor="w", width=100)
 
         
     # Ordena alfabéticamente las listas de contactos antes de insertarlas.
@@ -625,15 +631,18 @@ def listar_cluster():
     root.update()
     messagebox.showinfo("Copiado", "El comando ha sido copiado al portapapeles.")
 
+
 def mostrar_comando(comando, titulo):
     """Muestra un cuadro de texto con un comando y lo copia automáticamente al portapapeles."""
-    ventana_comando = tk.Toplevel()
+    
+    ventana_comando = ctk.CTkToplevel()
     ventana_comando.title(f"Comando {titulo}")
     ventana_comando.geometry("800x400")
-    ventana_comando.configure(bg="black")
+    ventana_comando.configure(fg_color="black")  # ← Aquí estaba el error: línea incompleta
 
-    cuadro_texto = tk.Text(ventana_comando, wrap="word", bg="#E9E9E9", fg="black", font=("Courier", 10))
-    cuadro_texto.pack(expand=True, fill="both", padx=10, pady=10)
+    # Cuadro de texto
+    cuadro_texto = CTkTextbox(ventana_comando, wrap="word", font=("Arial", 10))
+    cuadro_texto.pack(expand=True, fill="both", padx=10, pady=5)
     cuadro_texto.insert("1.0", comando)
     cuadro_texto.configure(state="normal")
 
@@ -642,9 +651,14 @@ def mostrar_comando(comando, titulo):
     ventana_comando.clipboard_append(comando)
     ventana_comando.update()
     messagebox.showinfo("Copiado", "El comando ha sido copiado al portapapeles.")
-    
-    boton_copiar = tk.Button(ventana_comando, text="Copiar al portapapeles", command=copiar_al_portapapeles,
-                             bg="#E9E9E9", fg="black", font=("Arial", 10, "bold"), relief="raised")
+
+    # Botón para copiar manualmente
+    boton_copiar = ctk.CTkButton(
+        ventana_comando,
+        text="Copiar al portapapeles",
+        command=lambda: copiar_comando(comando),  # Asegúrate de tener esta función definida
+        font=("Arial", 10, "bold")
+    )
     boton_copiar.pack(pady=1)
 
 def copiar_comando(comando):
@@ -677,16 +691,20 @@ def generar_comando_kubectl():
             return
             
     # Si no existe, crear una nueva ventana
-    ventana_opciones = tk.Toplevel(root)
+    # Crear la ventana
+    ventana_opciones = ctk.CTkToplevel(root)
     ventana_opciones.title("GENERADOR DE COMANDOS")
     ventanas_hijas.append(ventana_opciones)
     ventana_opciones.transient(root)
     ventana_opciones.geometry(f"230x560+{nueva_x}+{y}")
-    ventana_opciones.configure(bg="#111111")
-    frame_kubectl = tk.Frame(ventana_opciones, bg="#111111")
+    ventana_opciones.configure(fg_color="black")  # ← Aquí estaba el error
+
+    # Crear el frame principal
+    frame_kubectl = ctk.CTkFrame(ventana_opciones)
     frame_kubectl.pack(pady=1, fill="x", padx=20)
     frame_kubectl.columnconfigure(0, weight=1)
     frame_kubectl.columnconfigure(1, weight=1)
+
 
 
     def generar_comando_ns():
@@ -780,35 +798,35 @@ filter log like /(?i)error|failed/
         mostrar_comando(query_conteo.strip(), "CloudWatch Conteo")
         
     
-    label_eks = tk.Label(frame_kubectl, text="EKS", bg="#111111", fg="white", font=("Arial", 12, "bold"))
+    label_eks = ctk.CTkLabel(frame_kubectl, text="EKS", font=("Arial", 12, "bold"))
     label_eks.grid(row=0, column=0, columnspan=2, pady=(0, 5), sticky="ew")
 
     # 🔹 PODs LIVE y TOP POD
-    frame_pods = tk.Frame(frame_kubectl, bg="#111111")
+    frame_pods = ctk.CTkFrame(frame_kubectl)
     frame_pods.grid(row=1, column=0, columnspan=2, pady=1, sticky="ew")
     frame_pods.columnconfigure(0, weight=1)
     frame_pods.columnconfigure(1, weight=1)
     frame_pods.columnconfigure(2, weight=1)  # ← agrega esta líne
 
-    btn_pods_live = tk.Button(frame_pods, text="LIVE", command=pods_live_monitor,
-                            width=22, bg="#E9E9E9", fg="black", font=("Arial", 10, "bold"), height=BUTTON_HEIGHT)
+    btn_pods_live = ctk.CTkButton(frame_pods, text="LIVE", command=pods_live_monitor,
+                            width=22, font=("Arial", 10, "bold"), height=BUTTON_HEIGHT)
     btn_pods_live.grid(row=0, column=0, padx=5, pady=0)
     btn_pods_live.bind("<Enter>", on_enter)
     btn_pods_live.bind("<Leave>", on_leave)
 
-    btn_top_pod = tk.Button(frame_pods, text="TOP", command=lambda: copiar_comando("kubectl.exe top pod -n"),
-                            width=22, bg="#E9E9E9", fg="black", font=("Arial", 10, "bold"), height=BUTTON_HEIGHT)
+    btn_top_pod = ctk.CTkButton(frame_pods, text="TOP", command=lambda: copiar_comando("kubectl.exe top pod -n"),
+                            width=22, font=("Arial", 10, "bold"), height=BUTTON_HEIGHT)
     btn_top_pod.grid(row=0, column=1, padx=5, pady=0)
     btn_top_pod.bind("<Enter>", on_enter)
     btn_top_pod.bind("<Leave>", on_leave)
     
-    btn_ns = tk.Button(
+    btn_ns = ctk.CTkButton(
     frame_pods,
     text="EVENTOS",
     command=generar_comando_ns,
     width=25,
-    bg="#E9E9E9",
-    fg="black",
+
+
     font=("Arial", 10, "bold"),
     height=BUTTON_HEIGHT
 )
@@ -818,31 +836,37 @@ filter log like /(?i)error|failed/
 
 
     # 🔹 Eliminar PODs y LOGs
-    frame_pods_logs = tk.Frame(frame_kubectl, bg="#111111")
+    frame_pods_logs = ctk.CTkFrame(frame_kubectl)
     frame_pods_logs.grid(row=2, column=0, columnspan=2, pady=1, sticky="ew")
     frame_pods_logs.columnconfigure(0, weight=1)
     frame_pods_logs.columnconfigure(1, weight=1)
 
-    btn_eliminar_pods = tk.Button(frame_pods_logs, text="DELETE", command=eliminar_pods,
-                                  width=20, bg="#E9E9E9", fg="black", font=("Arial", 10, "bold"), height=BUTTON_HEIGHT)
+    btn_eliminar_pods = ctk.CTkButton(frame_pods_logs, text="DELETE", command=eliminar_pods,
+                                  width=20, font=("Arial", 10, "bold"), height=BUTTON_HEIGHT)
     btn_eliminar_pods.grid(row=0, column=0, padx=5, pady=0)
     btn_eliminar_pods.bind("<Enter>", on_enter)
     btn_eliminar_pods.bind("<Leave>", on_leave)
 
-    btn_logs = tk.Button(frame_pods_logs, text="LOGs GREP", command=generar_logs,
-                         width=20, bg="#E9E9E9", fg="black", font=("Arial", 10, "bold"), height=BUTTON_HEIGHT)
+    btn_logs = ctk.CTkButton(
+    frame_pods_logs,
+    text="LOGs GREP",
+    command=generar_logs,
+    width=20,
+    font=("Arial", 10, "bold"),
+    height=BUTTON_HEIGHT
+    )
     btn_logs.grid(row=0, column=1, padx=5, pady=0)
     btn_logs.bind("<Enter>", on_enter)
     btn_logs.bind("<Leave>", on_leave)
 
     # 🔹 PODs NO RUNNING justo debajo
-    btn_pods_no_running = tk.Button(
+    btn_pods_no_running = ctk.CTkButton(
         frame_pods_logs,
         text="PODs NO RUNNING",
         command=pods_no_running,
         width=42,
-        bg="#E9E9E9",
-        fg="black",
+
+
         font=("Arial", 10, "bold"),
         height=BUTTON_HEIGHT
     )
@@ -851,16 +875,16 @@ filter log like /(?i)error|failed/
     btn_pods_no_running.bind("<Leave>", on_leave)
 
     # 🔹 PODs NO RUNNING (en un frame separado justo debajo)
-    frame_pods_no_running = tk.Frame(frame_kubectl, bg="#111111")
+    frame_pods_no_running = ctk.CTkFrame(frame_kubectl)
     frame_pods_no_running.grid(row=4, column=0, columnspan=2, pady=(0, 5), sticky="ew")
 
-    btn_pods_no_running = tk.Button(
+    btn_pods_no_running = ctk.CTkButton(
         frame_pods_no_running,
         text="PODs NO RUNNING",
         command=pods_no_running,
         width=42,
-        bg="#E9E9E9",
-        fg="black",
+
+
         font=("Arial", 10, "bold"),
         height=BUTTON_HEIGHT
     )
@@ -871,17 +895,17 @@ filter log like /(?i)error|failed/
 
     # Inicio de la reubicación
     # Frame para el título y los botones de CLUSTER
-    frame_cluster = tk.Frame(frame_kubectl, bg="#111111")
+    frame_cluster = ctk.CTkFrame(frame_kubectl)
     frame_cluster.grid(row=3, column=0, columnspan=2, pady=1, sticky="ew")
     frame_cluster.columnconfigure(0, weight=1)
     frame_cluster.columnconfigure(1, weight=1)
-    label_cluster = tk.Label(frame_cluster, text="CLUSTER", bg="#111111", fg="white", font=("Arial", 12, "bold"))
+    label_cluster = ctk.CTkLabel(frame_cluster, text="CLUSTER", font=("Arial", 12, "bold"))
     label_cluster.grid(row=0, column=0, columnspan=2, pady=0, sticky="ew")
-    btn_listar_cluster = tk.Button(frame_cluster, text="LISTAR", command=listar_cluster, height=BUTTON_HEIGHT, width=13, bg="#E9E9E9", fg="black", font=("Arial", 10, "bold"), relief="solid", bd=2)
+    btn_listar_cluster = ctk.CTkButton(frame_cluster, text="LISTAR", command=listar_cluster, height=BUTTON_HEIGHT, width=13, font=("Arial", 10, "bold"))
     btn_listar_cluster.grid(row=1, column=0, padx=5, pady=(0, 5), sticky="ew")
     btn_listar_cluster.bind("<Enter>", on_enter)
     btn_listar_cluster.bind("<Leave>", on_leave)
-    btn_cluster = tk.Button(frame_cluster, text="INGRESAR", command=ingresar_a_cluster, height=BUTTON_HEIGHT, width=13, bg="#E9E9E9", fg="black", font=("Arial", 10, "bold"), relief="solid", bd=2)
+    btn_cluster = ctk.CTkButton(frame_cluster, text="INGRESAR", command=ingresar_a_cluster, height=BUTTON_HEIGHT, width=13, font=("Arial", 10, "bold"))
     btn_cluster.grid(row=1, column=1, padx=5, pady=(0, 5), sticky="ew")
     btn_cluster.bind("<Enter>", on_enter)
     btn_cluster.bind("<Leave>", on_leave)
@@ -889,11 +913,11 @@ filter log like /(?i)error|failed/
 
 
     # Título de la sección
-    label_deployment = tk.Label(frame_kubectl, text="DEPLOYMENT", bg="#111111", fg="white", font=("Arial", 12, "bold"))
+    label_deployment = ctk.CTkLabel(frame_kubectl, text="DEPLOYMENT", font=("Arial", 12, "bold"))
     label_deployment.grid(row=8, column=0, columnspan=2, pady=1, sticky="ew")
     
     # Crear un frame contenedor para los botones
-    frame_deployment = tk.Frame(frame_kubectl, bg="#111111")
+    frame_deployment = ctk.CTkFrame(frame_kubectl)
     frame_deployment.grid(row=9, column=0, columnspan=2, pady=1, sticky="ew")
     frame_deployment.columnconfigure(0, weight=1)
     frame_deployment.columnconfigure(1, weight=1)
@@ -904,8 +928,8 @@ filter log like /(?i)error|failed/
         if ns:
             copiar_comando(f"kubectl get deployment -n {ns}")
     
-    btn_listar_d = tk.Button(frame_deployment, text="LISTAR", command=listar_deployment,
-                             width=15, bg="#E9E9E9", fg="black", font=("Arial", 10, "bold"), height=BUTTON_HEIGHT)
+    btn_listar_d = ctk.CTkButton(frame_deployment, text="LISTAR", command=listar_deployment,
+                             width=15, font=("Arial", 10, "bold"), height=BUTTON_HEIGHT)
     btn_listar_d.grid(row=0, column=0, padx=5, pady=5)
     btn_listar_d.bind("<Enter>", on_enter)
     btn_listar_d.bind("<Leave>", on_leave)
@@ -917,18 +941,24 @@ filter log like /(?i)error|failed/
         if ns and name:
             copiar_comando(f"kubectl describe deployment -n {ns} {name}")
     
-    btn_describir_d = tk.Button(frame_deployment, text="DESCRIBE", command=describir_deployment,
-                                width=15, bg="#E9E9E9", fg="black", font=("Arial", 10, "bold"), height=BUTTON_HEIGHT)
+    btn_describir_d = ctk.CTkButton(
+        frame_deployment,
+        text="DESCRIBE",
+        command=describir_deployment,
+        width=15,
+        font=("Arial", 10, "bold"),
+        height=BUTTON_HEIGHT
+    )
     btn_describir_d.grid(row=0, column=1, padx=5, pady=0)
     btn_describir_d.bind("<Enter>", on_enter)
     btn_describir_d.bind("<Leave>", on_leave)
     
     # Título de la sección CONFIG MAP
-    label_configmap = tk.Label(frame_kubectl, text="CONFIG MAP", bg="#111111", fg="white", font=("Arial", 12, "bold"))
+    label_configmap = ctk.CTkLabel(frame_kubectl, text="CONFIG MAP", font=("Arial", 12, "bold"))
     label_configmap.grid(row=10, column=0, columnspan=2, pady=1, sticky="ew")
     
     # Crear un frame contenedor para los botones
-    frame_configmap = tk.Frame(frame_kubectl, bg="#111111")
+    frame_configmap = ctk.CTkFrame(frame_kubectl)
     frame_configmap.grid(row=11, column=0, columnspan=2, pady=1, sticky="ew")
     frame_configmap.columnconfigure(0, weight=1)
     frame_configmap.columnconfigure(1, weight=1)
@@ -939,8 +969,8 @@ filter log like /(?i)error|failed/
         if ns:
             copiar_comando(f"kubectl.exe get configmaps -n {ns}")
     
-    btn_listar_c = tk.Button(frame_configmap, text="LISTAR", command=listar_configmap,
-                             width=15, bg="#E9E9E9", fg="black", font=("Arial", 10, "bold"), height=BUTTON_HEIGHT)
+    btn_listar_c = ctk.CTkButton(frame_configmap, text="LISTAR", command=listar_configmap,
+                             width=15, font=("Arial", 10, "bold"), height=BUTTON_HEIGHT)
     btn_listar_c.grid(row=0, column=0, padx=5, pady=5)
     btn_listar_c.bind("<Enter>", on_enter)
     btn_listar_c.bind("<Leave>", on_leave)
@@ -952,8 +982,14 @@ filter log like /(?i)error|failed/
         if ns and name:
             copiar_comando(f"kubectl.exe describe configmap {name} -n {ns}")
     
-    btn_describir_c = tk.Button(frame_configmap, text="DESCRIBE", command=describir_configmap,
-                                width=15, bg="#E9E9E9", fg="black", font=("Arial", 10, "bold"), height=BUTTON_HEIGHT)
+    btn_describir_c = ctk.CTkButton(
+    frame_configmap,
+    text="DESCRIBE",
+    command=describir_configmap,
+    width=15,
+    font=("Arial", 10, "bold"),
+    height=BUTTON_HEIGHT
+    )
     btn_describir_c.grid(row=0, column=1, padx=5, pady=0)
     btn_describir_c.bind("<Enter>", on_enter)
     btn_describir_c.bind("<Leave>", on_leave)
@@ -963,19 +999,19 @@ filter log like /(?i)error|failed/
 
 
 
-    label_cloudwatch = tk.Label(frame_kubectl, text="EKS LOGs INSIGHTS", bg="#111111", fg="white", font=("Arial", 12, "bold"))
+    label_cloudwatch = ctk.CTkLabel(frame_kubectl, text="EKS LOGs INSIGHTS", font=("Arial", 12, "bold"))
     label_cloudwatch.grid(row=16, column=0, columnspan=2, pady=5, sticky="ew")
     
     frame_kubectl.columnconfigure(0, weight=1)
     frame_kubectl.columnconfigure(1, weight=1)
     frame_kubectl.columnconfigure(2, weight=1)
     
-    btn_logs_grep = tk.Button(
+    btn_logs_grep = ctk.CTkButton(
     frame_kubectl,
     text="LOGs CON GREP",
     command=generar_query_cloudwatch,
-    bg="#E9E9E9",
-    fg="black",
+
+
     font=("Arial", 10, "bold"),
     height=BUTTON_HEIGHT,
     width=16
@@ -984,12 +1020,12 @@ filter log like /(?i)error|failed/
     btn_logs_grep.bind("<Enter>", on_enter)
     btn_logs_grep.bind("<Leave>", on_leave)
 
-    btn_conteo_errores = tk.Button(
+    btn_conteo_errores = ctk.CTkButton(
         frame_kubectl,
         text="CONTEO ERRORES",
         command=generar_query_cloudwatch_conteo,
-        bg="#E9E9E9",
-        fg="black",
+
+
         font=("Arial", 10, "bold"),
         height=BUTTON_HEIGHT,
         width=16
@@ -999,7 +1035,7 @@ filter log like /(?i)error|failed/
     btn_conteo_errores.bind("<Leave>", on_leave)
     
     # Crear un frame contenedor centrado en el grid
-    frame_cmds = tk.Frame(frame_kubectl, bg="#111111")
+    frame_cmds = ctk.CTkFrame(frame_kubectl)
     frame_cmds.grid(row=15, column=0, columnspan=2, pady=1, sticky="ew")
 
     # Centrar el contenido dentro del frame
@@ -1008,14 +1044,13 @@ filter log like /(?i)error|failed/
 
 
     # Título EXPORTAR LOGS
-    label_exportlogs = tk.Label(frame_kubectl, text="EXPORTAR LOGS", bg="#111111", fg="white", font=("Arial", 12, "bold"))
+    label_exportlogs = ctk.CTkLabel(frame_kubectl, text="EXPORTAR LOGS", font=("Arial", 12, "bold"))
     label_exportlogs.grid(row=12, column=0, columnspan=2, pady=5, sticky="ew")
     
     # Crear un frame contenedor para los botones
-    frame_cmds = tk.Frame(frame_kubectl, bg="#111111")
+    frame_cmds = ctk.CTkFrame(frame_kubectl)
     frame_cmds.grid(row=13, column=0, columnspan=2, pady=(5, 10), sticky="ew")
 
-    
     
     
     def generar_bash_logs_grep():
@@ -1025,35 +1060,50 @@ filter log like /(?i)error|failed/
         namespace_input = simpledialog.askstring("Namespace", "Ingresa el namespace:")
         if not namespace_input:
             return
-    
+
         pod_lines = pods_input.strip().splitlines()
         namespace = namespace_input.strip()
-    
+
         nombres_pods = []
         for line in pod_lines:
             partes = line.strip().split()
             if partes:
                 nombres_pods.append(partes[0])
-    
+
         pods_str = " \\\n    ".join(nombres_pods)
-        grep_expr = "error|failed|Failed|Exception|stopped|exception|statuscode|ready|peering|undefined|url|messageid|database|ssl|detected|unable|Unable|certificate|certificado|certificates|unknown|status|504|500|GATEWAY_TIMEOUT|rejected|fatal|GATEWAY|TIMEOUT|KEYSTORE|null|RBAC|denied|SSL|ssl|INVALIDA|invalida|secret|Error|error|ERROR|conficts|refused|REFUSED|jwt|JWT|Server Error|not found|invalid|ready"
-    
+        grep_expr = (
+            "error|failed|Failed|Exception|stopped|exception|statuscode|ready|peering|undefined|url|messageid|database|ssl|"
+            "detected|unable|Unable|certificate|certificado|certificates|unknown|status|504|500|GATEWAY_TIMEOUT|rejected|"
+            "fatal|GATEWAY|TIMEOUT|KEYSTORE|null|RBAC|denied|SSL|ssl|INVALIDA|invalida|secret|Error|error|ERROR|conficts|"
+            "refused|REFUSED|jwt|JWT|Server Error|not found|invalid|ready"
+        )
+
         bash_script = f"""for pod in {pods_str} ; do
         echo "Logs for pod: $pod"
         kubectl logs -n {namespace} $pod | grep -i -E '{grep_expr}' > $pod.txt
     done"""
-    
-        # Mostrar en ventana editable
-        ventana_bash = tk.Toplevel()
-        ventana_bash.title("Script Bash para Logs con GREP")
-        ventana_bash.configure(bg="white")
-    
-        text_widget = tk.Text(ventana_bash, wrap="word", font=("Consolas", 10), bg="white", fg="black")
-        text_widget.pack(expand=True, fill="both", padx=10, pady=10)
-        text_widget.insert("1.0", bash_script)
-    
-    # Copiar al portapapeles
 
+        # Mostrar en ventana editable
+        ventana_bash = ctk.CTkToplevel()
+        ventana_bash.title("Script Bash para Logs con GREP")
+        ventana_bash.geometry("800x400")
+        ventana_bash.configure(fg_color="black")
+
+        # Crear el widget de texto
+        text_widget = tk.Text(ventana_bash, wrap="word", font=("Consolas", 10))
+        text_widget.pack(expand=True, fill="both", padx=10, pady=5)
+
+        # Insertar el contenido del script
+        text_widget.insert("1.0", bash_script)
+
+        # Copiar al portapapeles automáticamente
+        ventana_bash.clipboard_clear()
+        ventana_bash.clipboard_append(bash_script)
+        ventana_bash.update()
+        messagebox.showinfo("Copiado", "El script ha sido copiado al portapapeles.")
+
+
+    
     
     
     
@@ -1079,34 +1129,49 @@ filter log like /(?i)error|failed/
 
         comandos_final = "\n".join(comandos)
 
-        # Crear ventana editable con fondo blanco
-        ventana_comandos = tk.Toplevel()
-        ventana_comandos.title("Comandos Generados")
-        ventana_comandos.configure(bg="white")
 
-        text_widget = tk.Text(ventana_comandos, wrap="word", font=("Consolas", 10), bg="white", fg="black")
-        text_widget.pack(expand=True, fill="both", padx=10, pady=10)
+
+        # Crear ventana editable con fondo blanco
+        ventana_comandos = ctk.CTkToplevel()
+        ventana_comandos.title("Comandos Generados")
+        ventana_comandos.geometry("800x400")
+        ventana_comandos.configure(fg_color="black")  # ← ahora sí está completa
+
+
+
+        # Insertar el contenido del script
         text_widget.insert("1.0", comandos_final)
 
         # Copiar al portapapeles automáticamente
         copiar_comando(comandos_final)
 
+
         # Configurar columnas del frame para que se distribuyan equitativamente
     frame_cmds.columnconfigure(0, weight=1)
     frame_cmds.columnconfigure(1, weight=1)
 
-    btn_cmd3 = tk.Button(frame_cmds, text="CON GREP", command=generar_bash_logs_grep,
-                        bg="#E9E9E9", fg="black", font=("Arial", 10, "bold"), height=BUTTON_HEIGHT)
+    btn_cmd3 = ctk.CTkButton(
+        frame_cmds,
+        text="CON GREP",
+        command=generar_bash_logs_grep,
+        font=("Arial", 10, "bold"),
+        height=BUTTON_HEIGHT
+    )
     btn_cmd3.grid(row=0, column=0, padx=5, pady=0, sticky="ew")
     btn_cmd3.bind("<Enter>", on_enter)
     btn_cmd3.bind("<Leave>", on_leave)
 
 
-    # Botón SIN GREP en columna 0
-    btn_cmd4 = tk.Button(frame_cmds, text="SIN GREP", command=exportar_logs_kubectl,
-                        bg="#E9E9E9", fg="black", font=("Arial", 10, "bold"), height=BUTTON_HEIGHT)
+    btn_cmd4 = ctk.CTkButton(
+    frame_cmds,
+    text="SIN GREP",
+    command=exportar_logs_kubectl,
+    font=("Arial", 10, "bold"),
+    height=BUTTON_HEIGHT
+    )
     btn_cmd4.grid(row=0, column=1, padx=5, pady=0, sticky="ew")
     btn_cmd4.bind("<Enter>", on_enter)
+
     btn_cmd4.bind("<Leave>", on_leave)
     
 def copiar_script(texto):
@@ -1132,27 +1197,37 @@ def mostrar_script():
             ventana.focus_force()
             return #
 
-    ventana_script = tk.Toplevel(root)
+    ventana_script = ctk.CTkToplevel(root)
     ventana_script.title("NUEVOS SCRIPTS")
     ventanas_hijas.append(ventana_script)
     ventana_script.transient(root)
     ventana_script.geometry(f"230x470+{nueva_x}+{y}")
-    ventana_script.configure(bg="#111111")
-    frame_script = tk.Frame(ventana_script, bg="black")
-    frame_script.pack(expand=True, padx=5, pady=10)
+    ventana_script.configure(fg_color="black")  # ← ahora sí está completa
+
+    # Crear el frame contenedor
+    frame_script = ctk.CTkFrame(ventana_script)
+    frame_script.pack(expand=True, padx=5, pady=5)
+
+    # Lista de textos para los botones
     button_texts = ["GOKU", "SCRIPT1", "SCRIPT2", "SCRIPT3", "SCRIPT4", "SCRIPT5"]
+
     for text in button_texts:
-        btn = tk.Button(frame_script, text=text, command=lambda t="~/Documents/goku": copiar_script(t), #
-                        height=BUTTON_HEIGHT, bg="#E9E9E9", fg="black", font=("Arial", 10, "bold"), relief="solid", bd=2)
+        btn = ctk.CTkButton(
+            frame_script,
+            text=text,
+            command=lambda t=text: copiar_script(t),
+            height=BUTTON_HEIGHT,
+            font=("Arial", 10, "bold")
+        )
         btn.pack(pady=1, fill="x")
         btn.bind("<Enter>", on_enter)
         btn.bind("<Leave>", on_leave)
 
 # Configuración de la ventana principal
-root = tk.Tk()
+root = ctk.CTk()
 root.title("by PINKY")
 root.geometry("230x590")
-root.configure(bg="#111111")
+root.configure(fg_color="black")
 root.resizable(False, False)
 
 def actualizar_posicion_ventanas_hijas(event):
@@ -1176,43 +1251,49 @@ root.bind("<Configure>", actualizar_posicion_ventanas_hijas)
 
 # Estilo para los botones
 style = ttk.Style()
-style.configure("TButton", background="white", foreground="black", font=("Arial", 10, "bold"), relief="solid", bordercolor="black", borderwidth=2)
+style.configure("TButton", background="white", foreground="black", font=("Arial", 10, "bold"))
 
 # Frame para el título y los botones de DOCUMENTACIÓN CYGNUS
-frame_documentacion = tk.Frame(root, bg="#111111")
+frame_documentacion = ctk.CTkFrame(root)
 frame_documentacion.pack(pady=7)
-label_titulo = tk.Label(frame_documentacion, text="DOCUMENTACIÓN", bg="#111111", fg="white", font=("Arial", 12, "bold"))
+
+label_titulo = ctk.CTkLabel(frame_documentacion, text="DOCUMENTACIÓN", font=("Arial", 12, "bold"))
 label_titulo.pack(pady=1)
-frame_botones_doc = tk.Frame(frame_documentacion, bg="#111111")
+
+frame_botones_doc = ctk.CTkFrame(frame_documentacion)
 frame_botones_doc.pack(pady=1)
-btn_crq = tk.Button(frame_botones_doc, text="CRQ", command=iniciar_proceso_crq, height=BUTTON_HEIGHT, bg="#E9E9E9", fg="black", font=("Arial", 10, "bold"), relief="solid", bd=2)
+
+btn_crq = ctk.CTkButton(frame_botones_doc, text="CRQ", command=iniciar_proceso_crq, height=BUTTON_HEIGHT, font=("Arial", 10, "bold"))
 btn_crq.pack(side=tk.LEFT, padx=5)
 btn_crq.bind("<Enter>", on_enter)
 btn_crq.bind("<Leave>", on_leave)
-btn_task = tk.Button(frame_botones_doc, text="TASK", command=iniciar_proceso_task, height=BUTTON_HEIGHT, bg="#E9E9E9", fg="black", font=("Arial", 10, "bold"), relief="solid", bd=2)
+
+btn_task = ctk.CTkButton(frame_botones_doc, text="TASK", command=iniciar_proceso_task, height=BUTTON_HEIGHT, font=("Arial", 10, "bold"))
 btn_task.pack(side=tk.LEFT, padx=5)
 btn_task.bind("<Enter>", on_enter)
 btn_task.bind("<Leave>", on_leave)
-btn_pods = tk.Button(frame_botones_doc, text="PODS", command=iniciar_proceso_pods, height=BUTTON_HEIGHT, bg="#E9E9E9", fg="black", font=("Arial", 10, "bold"), relief="solid", bd=2)
+
+btn_pods = ctk.CTkButton(frame_botones_doc, text="PODS", command=iniciar_proceso_pods, height=BUTTON_HEIGHT, font=("Arial", 10, "bold"))
 btn_pods.pack(side=tk.LEFT, padx=5)
 btn_pods.bind("<Enter>", on_enter)
 btn_pods.bind("<Leave>", on_leave)
 
 # Botón de Evento/Incidente y el nuevo botón en un mismo frame
-frame_evento = tk.Frame(root, bg="#111111")
+# Botón de Evento/Incidente y el nuevo botón en un mismo frame
+frame_evento = ctk.CTkFrame(root)
 frame_evento.pack(pady=1)
 
 # Botón de Evento/Incidente
-btn_evento = tk.Button(
+btn_evento = ctk.CTkButton(
     frame_evento,
     text="EVENTO / INCIDENTE",
     command=generar_evento_incidente,
     width=18,
-    bg="#E9E9E9",
-    fg="black",
+
+
     font=("Arial", 10, "bold"),
-    relief="solid",
-    bd=2,
+
+
     height=BUTTON_HEIGHT
 )
 btn_evento.pack(pady=1)
@@ -1220,39 +1301,36 @@ btn_evento.bind("<Enter>", on_enter)
 btn_evento.bind("<Leave>", on_leave)
 
 # Botón MONGO debajo
-btn_mongo = tk.Button(
+btn_mongo = ctk.CTkButton(
     frame_evento,
     text="MONGO",
     command=mostrar_mongo,
     width=8,
-    bg="#E9E9E9",
-    fg="black",
+
+
     font=("Arial", 10, "bold"),
-    relief="solid",
-    bd=2,
+
+
     height=BUTTON_HEIGHT
 )
 btn_mongo.pack(pady=5)
 btn_mongo.bind("<Enter>", on_enter)
 btn_mongo.bind("<Leave>", on_leave)
 
-
-
-subframe_horizontal = tk.Frame(frame_evento, bg="#111111")
+subframe_horizontal = ctk.CTkFrame(frame_evento)
 subframe_horizontal.pack()
 
-
 # Nuevo botón "RESPUESTA CIBER"
-btn_respuesta_ciber = tk.Button(
+btn_respuesta_ciber = ctk.CTkButton(
     frame_evento,
     text="CIBER",
     command=generar_respuesta_ciber,
     width=10,
-    bg="#E9E9E9",
-    fg="black",
+
+
     font=("Arial", 10, "bold"),
-    relief="solid",
-    bd=2,
+
+
     height=BUTTON_HEIGHT
 )
 btn_respuesta_ciber.pack(side=tk.LEFT, padx=5)
@@ -1261,16 +1339,16 @@ btn_respuesta_ciber.bind("<Leave>", on_leave)
 
 
 
-btn_ha_info = tk.Button(
+btn_ha_info = ctk.CTkButton(
     frame_evento, # Asegúrate de que este es el 'frame' correcto donde quieres que aparezca el botón
     text="INFO CRQs",
     command=generar_ha_info,
     width=10,
-    bg="#E9E9E9",
-    fg="black",
+
+
     font=("Arial", 10, "bold"),
-    relief="solid",
-    bd=2,
+
+
     height=BUTTON_HEIGHT
 )
 btn_ha_info.pack(side=tk.LEFT, padx=5)
@@ -1283,62 +1361,63 @@ btn_ha_info.bind("<Leave>", on_leave)
 
 
 # Frame para el título y el botón de KUBECTL
-frame_kubectl = tk.Frame(root, bg="#111111")
+frame_kubectl = ctk.CTkFrame(root)
 frame_kubectl.pack(pady=1, fill="x", padx=20)
 frame_kubectl.columnconfigure(0, weight=1)
-label_kubectl = tk.Label(frame_kubectl, text="KUBECTL", bg="#111111", fg="white", font=("Arial", 12, "bold"))
+
+label_kubectl = ctk.CTkLabel(frame_kubectl, text="KUBECTL", font=("Arial", 12, "bold"))
 label_kubectl.grid(row=0, column=0, pady=7, sticky="ew")
 
-btn_kubectl = tk.Button(
+btn_kubectl = ctk.CTkButton(
     frame_kubectl,
     text="GENERADOR COMANDOS",
     command=generar_comando_kubectl,
     height=BUTTON_HEIGHT,              
     width=38,              
-    bg="#E9E9E9",
-    fg="black",
+
+
     font=("Arial", 10, "bold"),
-    relief="solid",
-    bd=2
+
 )
 
 btn_kubectl.grid(row=1, column=0, padx=10, pady=0)
 btn_kubectl.bind("<Enter>", on_enter)
 btn_kubectl.bind("<Leave>", on_leave)
 
-btn_script = tk.Button(
+btn_script = ctk.CTkButton(
     frame_kubectl,
     text="SCRIPTS",  # Mayúsculas para consistencia
     command=mostrar_script,
     height=BUTTON_HEIGHT,
     width=8,
-    bg="#E9E9E9",
-    fg="black",
+
+
     font=("Arial", 10, "bold"),
-    relief="solid",
-    bd=2
+
 )
 btn_script.grid(row=2, column=0, padx=40, pady=1)
 btn_script.bind("<Enter>", on_enter)
 btn_script.bind("<Leave>", on_leave)
 
 # Frame para el título y los botones de CONTACTOS
-frame_contactos = tk.Frame(root, bg="#111111")
+# Frame para el título y los botones de CONTACTOS
+frame_contactos = ctk.CTkFrame(root)
 frame_contactos.pack(pady=0, fill="x")
 frame_contactos.columnconfigure(0, weight=1)
 frame_contactos.columnconfigure(1, weight=1)
-label_contactos = tk.Label(frame_contactos, text="CONTACTOS", bg="#111111", fg="white", font=("Arial", 12, "bold"))
+
+label_contactos = ctk.CTkLabel(frame_contactos, text="CONTACTOS", font=("Arial", 12, "bold"))
 label_contactos.grid(row=0, column=0, columnspan=2, pady=7, sticky="ew")
 
 
 
 # Sub-frame centrado para los botones TEL y NUESTROS
-subframe_botones_contactos = tk.Frame(frame_contactos, bg="#111111")
+subframe_botones_contactos = ctk.CTkFrame(frame_contactos)
 subframe_botones_contactos.grid(row=1, column=0, columnspan=2, pady=(0, 2))
 
-btn_tel = tk.Button(subframe_botones_contactos, text="VARIOS", command=mostrar_telefonos,
-                    width=8, bg="#E9E9E9", fg="black", font=("Arial", 10, "bold"),
-                    relief="solid", bd=2, height=BUTTON_HEIGHT)
+btn_tel = ctk.CTkButton(subframe_botones_contactos, text="VARIOS", command=mostrar_telefonos,
+                    width=8, font=("Arial", 10, "bold"),
+ height=BUTTON_HEIGHT)
 btn_tel.pack(side=tk.LEFT, padx=5)
 btn_tel.bind("<Enter>", on_enter)
 btn_tel.bind("<Leave>", on_leave)
@@ -1361,31 +1440,34 @@ def mostrar_nuestros():
             ventana.focus_force()
             return
 
-    # Create new window
-    ventana_nuestros = tk.Toplevel(root)
+    # Crear nueva ventana
+    ventana_nuestros = ctk.CTkToplevel(root)
     ventana_nuestros.title("Contactos Nuestros")
     ventanas_hijas.append(ventana_nuestros)
     ventana_nuestros.transient(root)
     ancho_nueva = 510
     alto_nueva = 400
     ventana_nuestros.geometry(f"{ancho_nueva}x{alto_nueva}+{nueva_x}+{y}")
-    ventana_nuestros.configure(bg="black")
+    ventana_nuestros.configure(fg_color="black")  # ← configuración visual válida
 
+    # Definir columnas y crear tabla
     columnas = ("Nombre", "Correo", "Teléfono")
     tabla = ttk.Treeview(ventana_nuestros, columns=columnas, show="headings")
-    tabla.pack(expand=True, fill="both", padx=10, pady=10)
+    tabla.pack(expand=True, fill="both", padx=10, pady=5)
 
+
+    # Configurar encabezados y columnas
     for col in columnas:
-        tabla.column("Nombre", anchor="w", width=110)
-        tabla.column("Correo", anchor="w", width=110)
-        tabla.column("Teléfono", anchor="w", width=10)
+        tabla.heading(col, text=col)
+        tabla.column(col, anchor="w", width=140)
 
-
-    tabla.insert("", "end", values=(f"--- NUESTROS ---", "", ""))
+    # Insertar encabezado de categoría y contactos
+    tabla.insert("", "end", values=("--- NUESTROS ---", "", ""))
     for contacto in contactos_nuestros:
         tabla.insert("", "end", values=contacto)
-    tabla.insert("", "end", values=("", "", ""))
+    tabla.insert("", "end", values=("", "", ""))  # Separador visual
 
+    # Estilo visual
     estilo = ttk.Style()
     estilo.theme_use("default")
     estilo.configure("Treeview", background="white", foreground="black", rowheight=25, fieldbackground="white")
@@ -1422,9 +1504,9 @@ contactos_nuestros = sorted([
 
 # Botón NUESTROS
 
-btn_nuestros = tk.Button(subframe_botones_contactos, text="CYGNUS", command=mostrar_nuestros,
-                         width=8, bg="#E9E9E9", fg="black", font=("Arial", 10, "bold"),
-                         relief="solid", bd=2, height=BUTTON_HEIGHT)
+btn_nuestros = ctk.CTkButton(subframe_botones_contactos, text="CYGNUS", command=mostrar_nuestros,
+                         width=8, font=("Arial", 10, "bold"),
+ height=BUTTON_HEIGHT)
 btn_nuestros.pack(side=tk.LEFT, padx=5)
 btn_nuestros.bind("<Enter>", on_enter)
 btn_nuestros.bind("<Leave>", on_leave)
@@ -1433,9 +1515,15 @@ btn_nuestros.bind("<Leave>", on_leave)
 
 
 # Frame para el título y los botones de PRESENTACIÓN TURNOS
-frame_turnos = tk.Frame(root, bg="#111111")
+# Frame para el título y los botones de PRESENTACIÓN TURNOS
+frame_turnos = ctk.CTkFrame(root)
 frame_turnos.pack(pady=1, fill="x")
-label_turnos = tk.Label(frame_turnos, text="TURNOS", bg="#111111", fg="white", font=("Arial", 12, "bold"))
+
+label_turnos = ctk.CTkLabel(
+    frame_turnos,
+    text="TURNOS",
+    font=("Arial", 12, "bold")
+)
 label_turnos.pack(pady=7)
 
 # Lista de integrantes
@@ -1505,65 +1593,92 @@ def seleccionar_integrantes(turno):
     
     
     
-    # Ventana principal de selección
-    ventana_seleccion = tk.Toplevel(root)
-    ventana_seleccion.transient(root)
-    ventanas_hijas.append(ventana_seleccion)  # Agrega a la lista para que se reposicione
 
-    # Calcular posición para que se abra justo al lado de la ventana principal
+    # Ventana principal de selección
+    ventana_seleccion = ctk.CTkToplevel(root)
+    ventana_seleccion.transient(root)
+    ventanas_hijas.append(ventana_seleccion)
+
+    # Posición al lado de la ventana principal
     x = root.winfo_x()
     y = root.winfo_y()
     ancho_principal = root.winfo_width()
     nueva_x = x + ancho_principal
     ventana_seleccion.geometry(f"230x470+{nueva_x}+{y}")
+    ventana_seleccion.title("Seleccionar y Ordenar")
+    ventana_seleccion.configure(fg_color="black")
+
 
     ventana_seleccion.title("Seleccionar y Ordenar")
-    ventana_seleccion.configure(bg="#111111")
-
-    
-    frame_contenido = tk.Frame(ventana_seleccion, bg="#111111")
-    frame_contenido.pack(padx=10, pady=10, fill="both", expand=True)
+    ventana_seleccion.configure(fg_color="black")  # ← línea corregida
 
     # Listbox para seleccionar los nombres
-    label_original = tk.Label(frame_contenido, text="1. Selecciona los integrantes:", bg="#111111", fg="white", font=("Arial", 10, "bold"))
+    label_original = ctk.CTkLabel(frame_contenido, text="1. Selecciona los integrantes:", font=("Arial", 10, "bold"))
     label_original.pack(pady=1)
-    listbox_original = tk.Listbox(frame_contenido, selectmode=tk.MULTIPLE, bg="#E9E9E9", fg="black", font=("Arial", 10), height=7)
-    for nombre in integrantes:
-        listbox_original.insert(tk.END, nombre)
+    
+    listbox_original = tk.Listbox(
+        frame_contenido,
+        selectmode=tk.MULTIPLE,
+        height=7
+    )
     listbox_original.pack(fill="x", padx=10, pady=1)
     
-    def pasar_seleccion():
-        seleccionados = [listbox_original.get(i) for i in listbox_original.curselection()]
-        if not seleccionados:
-            messagebox.showwarning("Advertencia", "Selecciona al menos un integrante de la lista.")
-            return
-
-        # Limpiar la lista de seleccionados y añadir los nuevos
-        listbox_seleccionados.delete(0, tk.END)
-        for nombre in seleccionados:
-            listbox_seleccionados.insert(tk.END, nombre)
+    for nombre in integrantes:
+        listbox_original.insert(tk.END, nombre)
             
-    # Botón para pasar la selección
-    btn_pasar = tk.Button(frame_contenido, text="Añadir >>", command=pasar_seleccion, bg="#E9E9E9", fg="black", font=("Arial", 10, "bold"), height=BUTTON_HEIGHT)
+    btn_pasar = ctk.CTkButton(
+        frame_contenido,
+        text="Añadir >>",
+        command=pasar_seleccion,
+        font=("Arial", 10, "bold"),
+        height=BUTTON_HEIGHT
+    )
     btn_pasar.pack(pady=1)
 
     # Listbox para los nombres seleccionados y reordenables
-    label_seleccionados = tk.Label(frame_contenido, text="2. Reordena (si es necesario):", bg="#111111", fg="white", font=("Arial", 10, "bold"))
+    label_seleccionados = ctk.CTkLabel(frame_contenido, text="2. Reordena (si es necesario):", font=("Arial", 10, "bold"))
     label_seleccionados.pack(pady=1)
-    listbox_seleccionados = tk.Listbox(frame_contenido, selectmode=tk.SINGLE, bg="#E9E9E9", fg="black", font=("Arial", 10), height=7)
+
+    listbox_seleccionados = tk.Listbox(
+        frame_contenido,
+        selectmode=tk.SINGLE,
+        height=7
+    )
     listbox_seleccionados.pack(fill="x", padx=10, pady=1)
 
-    # Botones de subir y bajar
-    frame_mover = tk.Frame(frame_contenido, bg="#111111")
+# Crear el frame contenedor
+    frame_mover = ctk.CTkFrame(frame_contenido)
     frame_mover.pack(pady=1)
-    btn_subir = tk.Button(frame_mover, text="▲ Subir", command=mover_arriba, bg="#E9E9E9", fg="black", font=("Arial", 9, "bold"), height=BUTTON_HEIGHT)
+
+    # Botón para subir
+    btn_subir = ctk.CTkButton(
+        frame_mover,
+        text="▲ Subir",
+        command=mover_arriba,
+        font=("Arial", 10, "bold"),
+        height=BUTTON_HEIGHT
+    )
     btn_subir.pack(side=tk.LEFT, padx=5)
-    btn_bajar = tk.Button(frame_mover, text="▼ Bajar", command=mover_abajo, bg="#E9E9E9", fg="black", font=("Arial", 9, "bold"), height=BUTTON_HEIGHT)
+
+    # Botón para bajar
+    btn_bajar = ctk.CTkButton(
+        frame_mover,
+        text="▼ Bajar",
+        command=mover_abajo,
+        font=("Arial", 10, "bold"),
+        height=BUTTON_HEIGHT
+    )
     btn_bajar.pack(side=tk.LEFT, padx=5)
 
     # Botón final para confirmar
-    btn_confirmar = tk.Button(frame_contenido, text="3. Generar", command=confirmar_seleccion, bg="#E9E9E9", fg="black", font=("Arial", 10, "bold"), height=BUTTON_HEIGHT)
-    btn_confirmar.pack(pady=10)
+    btn_confirmar = ctk.CTkButton(
+        frame_contenido,
+        text="3. Generar",
+        command=confirmar_seleccion,
+        font=("Arial", 10, "bold"),
+        height=BUTTON_HEIGHT
+    )
+    btn_confirmar.pack(pady=5)
 
     def copiar_turno_individual():
         if turno == "6-2":
@@ -1578,29 +1693,37 @@ def seleccionar_integrantes(turno):
         root.update()
         messagebox.showinfo("Copiado", "Copiado correctamente al portapapeles.")
 
-    btn_turno_solo = tk.Button(
+    btn_turno_solo = ctk.CTkButton(
         frame_contenido,
         text="4. SOLO EN TURNO",
         command=copiar_turno_individual,
-        bg="#E9E9E9",
-        fg="black",
+
+
         font=("Arial", 10, "bold"),
         height=BUTTON_HEIGHT
     )
-    btn_turno_solo.pack(pady=10)
+    btn_turno_solo.pack(pady=5)
 
 # Botones de turnos
-frame_botones_turnos = tk.Frame(frame_turnos, bg="#111111")
+# Botones de turnos
+frame_botones_turnos = ctk.CTkFrame(frame_turnos)
 frame_botones_turnos.pack(pady=1)
+
 for turno in ["6-2", "2-10", "10-6"]:
-    btn = tk.Button(frame_botones_turnos, text=turno, command=lambda t=turno: seleccionar_integrantes(t),
-                    height=BUTTON_HEIGHT, bg="#E9E9E9", fg="black", font=("Arial", 10, "bold"), relief="solid", bd=2, width=4)
+    btn = ctk.CTkButton(
+        frame_botones_turnos,
+        text=turno,
+        command=lambda t=turno: seleccionar_integrantes(t),
+        height=BUTTON_HEIGHT,
+        font=("Arial", 10, "bold"),
+        width=4
+    )
     btn.pack(side=tk.LEFT, padx=5)
     btn.bind("<Enter>", on_enter)
     btn.bind("<Leave>", on_leave)
 
 
-frame_img = tk.Frame(root, bg="black")
+frame_img = ctk.CTkFrame(root)
 frame_img.pack(pady=1)
 def abrir_url(url):
     """Abre la URL dada en una nueva ventana del navegador."""
@@ -1626,26 +1749,27 @@ def imagen_clicada(event):
             ventana.focus_force()
             return
 
-    ventana_botones = tk.Toplevel(root)
+    ventana_botones = ctk.CTkToplevel(root)
     ventana_botones.title("Enlaces Cygnus")
     ventanas_hijas.append(ventana_botones)
     ventana_botones.transient(root)
     ventana_botones.geometry(f"230x590+{nueva_x}+{y}")
-    ventana_botones.configure(bg="#111111")
+    ventana_botones.configure(fg_color="black")  # o cualquier otra propiedad válida
     ventana_botones.resizable(False, False)
 
     # Crear el Canvas y la barra de desplazamiento
-    contenedor_canvas = tk.Frame(ventana_botones, bg="black")
+    contenedor_canvas = ctk.CTkFrame(ventana_botones)
     contenedor_canvas.pack(side="left", fill="both", expand=True)
 
-    canvas = tk.Canvas(contenedor_canvas, bg="black", highlightthickness=0)
+    canvas = tk.Canvas(contenedor_canvas, highlightthickness=0)
     scrollbar = ttk.Scrollbar(contenedor_canvas, orient="vertical", command=canvas.yview)
     canvas.configure(yscrollcommand=scrollbar.set)
     scrollbar.pack(side="right", fill="y")
     canvas.pack(side="left", fill="both", expand=True)
 
     # Crear un Frame interior donde irán los botones
-    frame_botones = tk.Frame(canvas, bg="black", padx=10, pady=10)
+    frame_botones = ctk.CTkFrame(canvas)
+    frame_botones.pack(padx=10, pady=5)  # ← esta línea es opcional si quieres margen interno
     canvas.create_window((0, 0), window=frame_botones, anchor="nw")
 
     def on_frame_configure(event):
@@ -1697,11 +1821,18 @@ def imagen_clicada(event):
     ]
     
     for texto_boton, url, color in botones_coloreados:
-        btn = tk.Button(frame_botones, text=texto_boton, command=lambda u=url: abrir_url(u),
-                bg=color, fg="black", font=("Arial", 9, "bold"), relief="solid", bd=2)
+        btn = ctk.CTkButton(
+            frame_botones,
+            text=texto_boton,
+            command=lambda u=url: abrir_url(u),
+            font=("Arial", 10, "bold"),
+            fg_color=color  # si quieres aplicar el color directamente
+        )
         btn.pack(pady=1, fill="x")
-        btn.bind("<Enter>", lambda e, b=btn: b.configure(bg="#E9E9E9"))
-        btn.bind("<Leave>", lambda e, b=btn, c=color: b.configure(bg=c))
+    
+        btn.bind("<Enter>", lambda e, b=btn: b.configure(fg_color="gray"))
+        btn.bind("<Leave>", lambda e, b=btn, c=color: b.configure(fg_color=c))
+
 
 
 
@@ -1710,62 +1841,18 @@ ruta_imagen = obtener_ruta_recurso("cygnussssss.png")
 if os.path.exists(ruta_imagen):
     img = Image.open(ruta_imagen)
     img = img.resize((190, 150), Image.Resampling.LANCZOS)
-    imagen_tk = ctk.CTkImage(light_image=img, dark_image=img, size=(100, 100))
-    # Crea un widget Label con la imagen y lo empaqueta en el frame
-    label_img = tk.Label(frame_img, image=imagen_tk, bd=0, highlightthickness=2, highlightbackground="gray")
-    label_img.pack(side="bottom", pady=10)  # para bajarla
-    # Guarda una referencia de la imagen para evitar que sea eliminada por el recolector de basura
-    label_img.image = imagen_tk
-    # Vincula el evento de clic a la imagen
+
+    # Crear imagen compatible con CTk
+    imagen_ctk = CTkImage(light_image=img, dark_image=img, size=(190, 150))
+
+    # Usar CTkLabel en lugar de ctk.CTkLabel
+    label_img = CTkLabel(master=frame_img, image=imagen_ctk, text="", fg_color="black")
+    label_img.pack(side="bottom", pady=5)
+
+    # Vincular eventos
     label_img.bind("<Button-1>", imagen_clicada)
     label_img.bind("<Enter>", on_enter_image)
     label_img.bind("<Leave>", on_leave_image)
 
 # Inicia el bucle de eventos de Tkinter
 root.mainloop() # Inicia el bucle principal de la aplicación.
-
-
-
-
-
-para el anterior codigo me sale el error
-
-[Running] python -u "c:\Users\efquinte\OneDrive - Grupo Bancolombia\Visual Banco\DOC CYGNUS\DOC 70.py"
-Traceback (most recent call last):
-  File "c:\Users\efquinte\OneDrive - Grupo Bancolombia\Visual Banco\DOC CYGNUS\DOC 70.py", line 91, in <module>
-    mostrar_ventana_carga()
-  File "c:\Users\efquinte\OneDrive - Grupo Bancolombia\Visual Banco\DOC CYGNUS\DOC 70.py", line 60, in mostrar_ventana_carga
-    label_img = tk.Label(ventana_carga, image=img_tk, bg="black")
-                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\efquinte\AppData\Local\Programs\Python\Python311\Lib\tkinter\__init__.py", line 3214, in __init__
-    Widget.__init__(self, master, 'label', cnf, kw)
-  File "C:\Users\efquinte\AppData\Local\Programs\Python\Python311\Lib\tkinter\__init__.py", line 2628, in __init__
-    self.tk.call(
-_tkinter.TclError: image "<customtkinter.windows.widgets.image.ctk_image.CTkImage object at 0x000001F8EFEC7590>" doesn't exist
-
-[Done] exited with code=1 in 4.455 seconds
-
-
-
-
-
-
-label_img = tk.Label(ventana_carga, image=img_tk, bg="black")
-# CORRECCIÓN: Guarda una referencia de la imagen en la etiqueta
-# para evitar que el objeto img_tk sea eliminado.
-label_img.image = img_tk 
-
-
-
-    # Imagen/logo
-    if os.path.exists(ruta_logo):
-        img = Image.open(ruta_logo)
-        img = img.resize((100, 100), Image.Resampling.LANCZOS)
-        img_tk = ctk.CTkImage(light_image=img, dark_image=img, size=(100, 100))
-        label_img = tk.Label(ventana_carga, image=img_tk, bg="black")
-        
-        # << PEGA LA CORRECCIÓN AQUÍ >>
-        label_img.image = img_tk
-        
-        label_img.pack(pady=(5, 5)) # 20 píxeles arriba, 5 abajo
-
