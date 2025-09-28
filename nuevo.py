@@ -1744,3 +1744,28 @@ Traceback (most recent call last):
 _tkinter.TclError: image "<customtkinter.windows.widgets.image.ctk_image.CTkImage object at 0x000001F8EFEC7590>" doesn't exist
 
 [Done] exited with code=1 in 4.455 seconds
+
+
+
+
+
+
+label_img = tk.Label(ventana_carga, image=img_tk, bg="black")
+# CORRECCIÓN: Guarda una referencia de la imagen en la etiqueta
+# para evitar que el objeto img_tk sea eliminado.
+label_img.image = img_tk 
+
+
+
+    # Imagen/logo
+    if os.path.exists(ruta_logo):
+        img = Image.open(ruta_logo)
+        img = img.resize((100, 100), Image.Resampling.LANCZOS)
+        img_tk = ctk.CTkImage(light_image=img, dark_image=img, size=(100, 100))
+        label_img = tk.Label(ventana_carga, image=img_tk, bg="black")
+        
+        # << PEGA LA CORRECCIÓN AQUÍ >>
+        label_img.image = img_tk
+        
+        label_img.pack(pady=(5, 5)) # 20 píxeles arriba, 5 abajo
+
