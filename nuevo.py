@@ -1723,3 +1723,24 @@ if os.path.exists(ruta_imagen):
 
 # Inicia el bucle de eventos de Tkinter
 root.mainloop() # Inicia el bucle principal de la aplicación.
+
+
+
+
+
+para el anterior codigo me sale el error
+
+[Running] python -u "c:\Users\efquinte\OneDrive - Grupo Bancolombia\Visual Banco\DOC CYGNUS\DOC 70.py"
+Traceback (most recent call last):
+  File "c:\Users\efquinte\OneDrive - Grupo Bancolombia\Visual Banco\DOC CYGNUS\DOC 70.py", line 91, in <module>
+    mostrar_ventana_carga()
+  File "c:\Users\efquinte\OneDrive - Grupo Bancolombia\Visual Banco\DOC CYGNUS\DOC 70.py", line 60, in mostrar_ventana_carga
+    label_img = tk.Label(ventana_carga, image=img_tk, bg="black")
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\efquinte\AppData\Local\Programs\Python\Python311\Lib\tkinter\__init__.py", line 3214, in __init__
+    Widget.__init__(self, master, 'label', cnf, kw)
+  File "C:\Users\efquinte\AppData\Local\Programs\Python\Python311\Lib\tkinter\__init__.py", line 2628, in __init__
+    self.tk.call(
+_tkinter.TclError: image "<customtkinter.windows.widgets.image.ctk_image.CTkImage object at 0x000001F8EFEC7590>" doesn't exist
+
+[Done] exited with code=1 in 4.455 seconds
