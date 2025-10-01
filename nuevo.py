@@ -15,6 +15,7 @@ from tkinter import ttk
 from customtkinter import CTkLabel, CTkImage
 from customtkinter import CTkTextbox  # Este import debe ir al inicio del archivo
 
+
 tooltip_label = None
 
 ctk.set_appearance_mode("dark")
@@ -40,7 +41,7 @@ ruta_logo = obtener_ruta_recurso("cygnusCARGA.png")
 def mostrar_ventana_carga():
     ventana_carga = ctk.CTk(fg_color="#000000")
     ventana_carga.title("By Pinky")
-    ventana_carga.geometry("230x250")
+    ventana_carga.geometry("230x240")
     ventana_carga.resizable(False, False)
 
     # Texto principal
@@ -129,7 +130,7 @@ def limpiar_texto(texto):
     Reemplaza caracteres especiales o no deseados, a menudo generados por la extracción
     de texto de PDFs, y se asegura de que el texto sea compatible con UTF-8.
     """
-    reemplazos = {' ': '', '\ue603': '', '\ue616': '', '\ue657': '', '\ue643': '', '\ue6a1': '', '\ue688': ''}
+    reemplazos = {'�': '', '\ue603': '', '\ue616': '', '\ue657': '', '\ue643': '', '\ue6a1': '', '\ue688': ''}
     for viejo, nuevo in reemplazos.items():
         texto = texto.replace(viejo, nuevo) # Itera sobre el diccionario y reemplaza los caracteres.
     return texto.encode('utf-8', 'ignore').decode('utf-8') # Codifica y decodifica para limpiar caracteres problemáticos.
@@ -209,7 +210,7 @@ def iniciar_proceso():
         return
 
     nombre_pdf = os.path.splitext(os.path.basename(ruta_pdf))[0] # Obtiene el nombre del archivo PDF sin la extensión.
-    datos_completos["Fecha de Proceso"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S") # Añade la fecha de proceso.
+    datos_completos["Fecha de Proceso"] = datetime.now().strftime("%d/%m/%Y %H:%M:%S") # Añade la fecha de proceso.
 
     salida_path = filedialog.asksaveasfilename(
         initialfile=f"{nombre_pdf}.docx",
@@ -238,8 +239,8 @@ def generar_evento_incidente():
         messagebox.showerror("Error", f"No se encontró la plantilla en {plantilla_path}") # Muestra un error si la plantilla no existe.
         return
 
-    fecha_actual = datetime.now().strftime("%Y-%m-%d %H:%M:%S") # Obtiene la fecha y hora actuales.
-    nombre_archivo = f"Evento_Incidente_{datetime.now().strftime('%Y%m%d_%H%M%S')}.docx" # Genera un nombre de archivo único.
+    fecha_actual = datetime.now().strftime("%d/%m/%Y %H:%M:%S") # Obtiene la fecha y hora actuales.
+    nombre_archivo = f"Evento_Incidente_{datetime.now().strftime('%d-%m-%Y_%H_%M_%S')}.docx" # Genera un nombre de archivo único.
 
     salida_path = filedialog.asksaveasfilename(
         initialfile=nombre_archivo,
@@ -261,18 +262,42 @@ def generar_evento_incidente():
 
 # Esta es la función corregida.
 def generar_respuesta_ciber():
-    """
-    Genera y copia al portapapeles una respuesta estándar para ciberseguridad.
-    """
-    id_ingresado = simpledialog.askstring("ID de la CRQ", "Ingresa el ID de la CRQ o ID que corresponda:")
+    id_ingresado = simpledialog.askstring("ID de la CRQ", "Ingresa el ID de la CRQ o ID que corresponda:", parent=root)
     if id_ingresado:
-        frase = f"Cordial saludo, se revela para validaciones sobre el ID: {id_ingresado}"
-        # La función 'copiar_comando' ya muestra el mensaje.
-        # Por eso, aquí solo la llamamos, sin duplicar la notificación.
-        copiar_comando(frase) 
+        frase = f"Cordial saludo, se revela el secreto para validaciones sobre el ID: {id_ingresado}"
+        root.clipboard_clear()
+        root.clipboard_append(frase)
+        root.update()
+        messagebox.showinfo("CIBER", "✅ Respuesta generada y copiada al portapapeles.")
     else:
         messagebox.showwarning("Aviso", "No se ingresó ningún ID. No se copió nada al portapapeles.")
 
+def mostrar_cloudshell():
+    x = root.winfo_x()
+    y = root.winfo_y()
+    ancho_principal = root.winfo_width()
+    nueva_x = x + ancho_principal
+
+    ventana_cloudshell = ctk.CTkToplevel(root)
+    ventana_cloudshell.title("CLOUDSHELL")
+    ventana_cloudshell.geometry(f"230x300+{nueva_x}+{y}")
+    ventana_cloudshell.configure(fg_color="black")
+    ventanas_hijas.append(ventana_cloudshell)
+    ventana_cloudshell.transient(root)
+
+    frame_botones = ctk.CTkFrame(ventana_cloudshell, fg_color="black")
+    frame_botones.pack(pady=10, padx=10, fill="both", expand=True)
+
+    for i in range(1, 10 + 1):
+        btn = ctk.CTkButton(
+            frame_botones,
+            text=str(i),
+            command=lambda n=i: messagebox.showinfo("CLOUDSHELL", f"Botón {n} presionado"),
+            font=("Arial", 11, "bold"),
+            height=BUTTON_HEIGHT,
+            corner_radius=10
+        )
+        btn.pack(pady=2, fill="x")
 # Botón MONGO
 def mostrar_mongo():
     x = root.winfo_x()
@@ -282,7 +307,7 @@ def mostrar_mongo():
 
     ventana_mongo = ctk.CTkToplevel(root)
     ventana_mongo.title("EXTENSIONES MONGO")
-    ventana_mongo.geometry(f"230x140+{nueva_x}+{y}")
+    ventana_mongo.geometry(f"230x160+{nueva_x}+{y}")
     ventana_mongo.configure(fg_color="black")  # ← Aquí se cierra correctamente
     ventanas_hijas.append(ventana_mongo)
     ventana_mongo.transient(root)
@@ -315,7 +340,7 @@ def mostrar_mongo():
         messagebox.showinfo("Copiado", "Comando copiado al portapapeles, pega el comando en la CLI de AWS para validar las extensiones y su estado")
 
     def activar_mongo():
-        arn_personalizado = simpledialog.askstring("ARN personalizado", "Ingresa el ARN para --execution-role-arn:")
+        arn_personalizado = simpledialog.askstring("ARN personalizado", "Ingresa el ARN para --execution-role-arn:", parent=root)
         if not arn_personalizado:
             messagebox.showwarning("Advertencia", "No se ingresó ningún ARN.")
             return
@@ -352,9 +377,24 @@ def mostrar_mongo():
             comandos.append(comando)
 
         mostrar_comando("\\n\\n".join(comandos), "Activar MONGO")
+        
+    
+    btn_validar_arn = ctk.CTkButton(
+    ventana_mongo,
+    text="VALIDAR ARN DE ROL 'MONGODB'",
+    command=lambda: copiar_comando_mongo("aws iam get-role --role-name OPS0001001-mongodb-atlas-extensions-role"),
+    font=("Arial", 11, "bold"),
+    width=9
+    )
+    btn_validar_arn.pack(pady=5)
+    btn_validar_arn.bind("<Enter>", on_enter)
+    btn_validar_arn.bind("<Leave>", on_leave)
+        
+    
+    
     btn_validar = ctk.CTkButton(
         ventana_mongo,
-        text="VALIDAR",
+        text="VALIDAR ESTADO DE EXTENSIONES",
         command=lambda: copiar_comando_mongo(comando_validar),
 
 
@@ -367,7 +407,7 @@ def mostrar_mongo():
 
     btn_activar = ctk.CTkButton(
         ventana_mongo,
-        text="ACTIVAR",
+        text="ACTIVAR EXTENSIONES",
         command=activar_mongo,
 
 
@@ -381,37 +421,29 @@ def mostrar_mongo():
 
     
 def generar_ha_info():
-    """
-    Genera y copia al portapapeles la información del proceso de cambio en Helix.
-    """
-    # El texto completo para copiar, con formato.
-    texto = """Para Ambientes Productivos se crea así:
+    texto = """Cordial saludo. A continuación, se detalla el procedimiento para ambientes productivos:
 
-1// En Helix crear una Petición de Cambio usando la plantilla (Template):
-Cambio en Produccion.Manual.Estandar.Administrativo_Nube AWS - GIOTI.Riesgo =1
- 
+1. En Helix, crear una Petición de Cambio usando la plantilla:
+   Cambio en Producción.Manual.Estandar.Administrativo_Nube AWS - GIOTI.Riesgo = 1
 
-2// **IMPORTANTE** !!Llenar la información obligatoria en el apartado de descripción
+2. Llenar la información obligatoria en el apartado de descripción.
 
-3// Seleccionar el "Grupo coordinador de cambios" (Change coordinator group: El grupo y quien solicita el proceso)
+3. Seleccionar los grupos correspondientes:
+   - Coordinador de cambios: quien solicita el proceso.
+   - Gestores de cambios: OC INTEGRADA OPERACION TI 2 CYGNUS APROBADORES CAMBIOS TI
 
-y
+4. Editar las fechas programadas (no modificar las fechas reales).
 
-Seleccionar el "Grupo de gestores de cambios" (Change manager group: El grupo que realiza el proceso): en este caso
-OC INTEGRADA OPERACION TI 2 CYGNUS APROBADORES CAMBIOS TI
+5. Guardar la petición y cambiar su estado de 'Borrador' a 'Programado para aprobación'.
 
-4// **IMPORTANTE** !! ... Editar las "Fechas programadas" y no tocar las "Fechas reales"
- 
-5// Guardar la Petición de Cambio, acá no termina todo
- 
-6// **IMPORTANTE** !! Luego cambiar estado de "Borrador" a "Programado para aprobación"
-
-
-Muchas Gracias.
+Muchas gracias.
 """
-    # Llama a la función que ya existe para copiar el texto al portapapeles
-    # y mostrar el mensaje de confirmación.
-    copiar_comando(texto)
+    root.clipboard_clear()
+    root.clipboard_append(texto)
+    root.update()
+    messagebox.showinfo("INFO CRQs", "✅ Plantilla para CRQ's copiada al portapapeles.")
+    
+    
 
 def llenar_plantilla(datos, plantilla_path, salida_path):
     """
@@ -445,7 +477,7 @@ def iniciar_proceso_task():
     if not os.path.exists(plantilla_path):
         messagebox.showerror("Error", f"No se encontró la plantilla en {plantilla_path}") # Muestra un error si la plantilla no existe.
         return
-    nombre_archivo = f"TASK_{datetime.now().strftime('%Y%m%d_%H%M%S')}.docx" # Genera el nombre del archivo.
+    nombre_archivo = f"TASK_{datetime.now().strftime('%d-%m-%Y_%H_%M_%S')}.docx" # Genera el nombre del archivo.
     salida_path = filedialog.asksaveasfilename(
         initialfile=nombre_archivo,
         defaultextension=".docx", # Extensión predeterminada.
@@ -457,7 +489,7 @@ def iniciar_proceso_task():
         return
     id_task = os.path.splitext(os.path.basename(salida_path))[0] # Obtiene el ID del archivo.
     datos = {
-    "Fecha de Proceso": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+    "Fecha de Proceso": datetime.now().strftime("%d/%m/%Y %H:%M:%S"),
     "ID del TASK": id_task
     }
     llenar_plantilla(datos, plantilla_path, salida_path)
@@ -468,7 +500,7 @@ def iniciar_proceso_pods():
     if not os.path.exists(plantilla_path):
         messagebox.showerror("Error", f"No se encontró la plantilla en {plantilla_path}")
         return
-    nombre_archivo = f"PODs_{datetime.now().strftime('%Y%m%d_%H%M%S')}.docx" # Genera el nombre del archivo.
+    nombre_archivo = f"PODs_{datetime.now().strftime('%d-%m-%Y_%H_%M_%S')}.docx" # Genera el nombre del archivo.
     salida_path = filedialog.asksaveasfilename(
         initialfile=nombre_archivo,
         defaultextension=".docx",
@@ -480,7 +512,7 @@ def iniciar_proceso_pods():
         return
     id_pod = os.path.splitext(os.path.basename(salida_path))[0] # Obtiene el ID del archivo.
     datos = {
-        "Fecha de Proceso": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "Fecha de Proceso": datetime.now().strftime("%d/%m/%Y %H:%M:%S"),
         "ID del POD": id_pod,
         "ID del EVENTO/INCIDENTE": id_pod
     }
@@ -714,7 +746,7 @@ def ingresar_a_cluster():
     """
     Pide un nombre de cluster, genera un comando de AWS CLI y lo copia al portapapeles.
     """
-    nombre_cluster = simpledialog.askstring("Nombre del Cluster", "Ingresa el nombre del cluster:") # Muestra un diálogo de entrada.
+    nombre_cluster = simpledialog.askstring("Nombre del Cluster", "Ingresa el nombre del cluster:", parent=root) # Muestra un diálogo de entrada.
     if not nombre_cluster: # Si se cancela, sale de la función.
         return
     comando = f"aws eks update-kubeconfig --name {nombre_cluster} --region us-east-1"
@@ -732,10 +764,11 @@ def listar_cluster():
 def mostrar_comando(comando, titulo):
     """Muestra un cuadro de texto con un comando y lo copia automáticamente al portapapeles."""
     
-    ventana_comando = ctk.CTkToplevel()
+    ventana_comando = ctk.CTkToplevel(root)
     ventana_comando.title(f"Comando {titulo}")
     ventana_comando.geometry("800x400")
-    ventana_comando.configure(fg_color="black")  # ← Aquí estaba el error: línea incompleta
+    ventana_comando.configure(fg_color="black")
+    ventana_comando.transient(root)  # ← Ayuda a mantenerla en primer plano
 
     # Cuadro de texto
     cuadro_texto = CTkTextbox(ventana_comando, wrap="word", font=("Arial", 10))
@@ -805,7 +838,7 @@ def generar_comando_kubectl():
 
 
     def generar_comando_ns():
-        namespace = simpledialog.askstring("Namespace", "Ingresa el namespace:")
+        namespace = simpledialog.askstring("Namespace", "Ingresa el namespace:", parent=root)
         if namespace:
             comando = f"kubectl get events --sort-by=.metadata.creationTimestamp -n {namespace} | grep -e Warning"
             root.clipboard_clear()
@@ -815,10 +848,10 @@ def generar_comando_kubectl():
         
         
     def eliminar_pods():
-        pods_input = simpledialog.askstring("Pods", "Ingresa los nombres de los pods (puedes pegar la salida de 'kubectl get pods'):") # Pide los nombres de los pods.
+        pods_input = simpledialog.askstring("Pods", "Ingresa los nombres de los pods (puedes pegar la salida de 'kubectl get pods'):", parent=root) # Pide los nombres de los pods.
         if not pods_input:
             return
-        namespace_input = simpledialog.askstring("Namespace", "Ingresa el namespace:") # Pide el namespace.
+        namespace_input = simpledialog.askstring("Namespace", "Ingresa el namespace:", parent=root) # Pide el namespace.
         if not namespace_input:
             return
         pod_lines = pods_input.strip().splitlines()
@@ -828,10 +861,10 @@ def generar_comando_kubectl():
         mostrar_comando(comandos, "Eliminar PODs")
 
     def generar_logs():
-        pods_input = simpledialog.askstring("Pods", "Ingresa los nombres de los pods (puedes pegar la salida de 'kubectl get pods'):")
+        pods_input = simpledialog.askstring("Pods", "Ingresa los nombres de los pods (puedes pegar la salida de 'kubectl get pods'):", parent=root)
         if not pods_input:
             return
-        namespace_input = simpledialog.askstring("Namespace", "Ingresa el namespace:") # Pide el namespace.
+        namespace_input = simpledialog.askstring("Namespace", "Ingresa el namespace:", parent=root) # Pide el namespace.
         if not namespace_input:
             return
         pod_lines = pods_input.strip().splitlines()
@@ -853,10 +886,10 @@ def generar_comando_kubectl():
         copiar_comando(comando)
 
     def pods_live_monitor():
-        pods_input = simpledialog.askstring("Pods", "Ingresa los nombres de los pods (puedes pegar la salida de 'kubectl get pods'):")
+        pods_input = simpledialog.askstring("Pods", "Ingresa los nombres de los pods (puedes pegar la salida de 'kubectl get pods'):", parent=root)
         if not pods_input:
             return
-        namespace_input = simpledialog.askstring("Namespace", "Ingresa el namespace:")
+        namespace_input = simpledialog.askstring("Namespace", "Ingresa el namespace:", parent=root)
         if not namespace_input:
             return
         pod_lines = pods_input.strip().splitlines() #
@@ -867,10 +900,10 @@ def generar_comando_kubectl():
         mostrar_comando(comando, "LIVE")
 
     def generar_query_cloudwatch():
-        pods_input = simpledialog.askstring("Pods", "Ingresa los nombres de los pods (puedes pegar la salida de 'kubectl get pods'):")
+        pods_input = simpledialog.askstring("Pods", "Ingresa los nombres de los pods (puedes pegar la salida de 'kubectl get pods'):", parent=root)
         if not pods_input:
             return
-        namespace_input = simpledialog.askstring("Namespace", "Ingresa el namespace:")
+        namespace_input = simpledialog.askstring("Namespace", "Ingresa el namespace:", parent=root)
         if not namespace_input:
             return
         pod_lines = pods_input.strip().splitlines()
@@ -898,198 +931,267 @@ filter log like /(?i)error|failed/
     label_eks = ctk.CTkLabel(frame_kubectl, text="EKS", font=("Arial", 12, "bold"), fg_color="#000000")
     label_eks.grid(row=0, column=0, columnspan=2,   pady=(3, 0), sticky="ew")
 
-    # 🔹 PODs LIVE y TOP POD
+    # 🔹 PODs LIVE y TOP POD    
     frame_pods = ctk.CTkFrame(frame_kubectl, fg_color="#000000")
     frame_pods.grid(row=1, column=0, columnspan=2, pady=1, sticky="ew")
+
+
+    # Configurar 3 columnas
     frame_pods.columnconfigure(0, weight=1)
     frame_pods.columnconfigure(1, weight=1)
-    frame_pods.columnconfigure(2, weight=1)  # ← agrega esta líne
+    frame_pods.columnconfigure(2, weight=1)
 
-    btn_pods_live = ctk.CTkButton(frame_pods, text="LIVE", command=pods_live_monitor,
-                            width=22, font=("Arial", 11, "bold"), height=BUTTON_HEIGHT,corner_radius=10) #Redondeado)  # ← )redondeado)
+
+
+    # Botón LIVE
+    btn_pods_live = ctk.CTkButton(
+        frame_pods,
+        text="LIVE",
+        command=pods_live_monitor,
+        height=BUTTON_HEIGHT,
+        corner_radius=10,
+        font=("Arial", 11, "bold"),
+        width=10
+    )
     btn_pods_live.grid(row=0, column=0, padx=5, pady=0)
-    btn_pods_live.bind("<Enter>", on_enter)
-    btn_pods_live.bind("<Leave>", on_leave)
 
-    btn_top_pod = ctk.CTkButton(frame_pods, text="TOP", command=lambda: copiar_comando("kubectl.exe top pod -n"),
-                            width=22, font=("Arial", 11, "bold"), height=BUTTON_HEIGHT, corner_radius=10) #Redondeado) #Redondeado
-    btn_top_pod.grid(row=0, column=1, padx=5, pady=0)
-    btn_top_pod.bind("<Enter>", on_enter)
-    btn_top_pod.bind("<Leave>", on_leave)
+
+
+    # Botón TOP
+    def generar_comando_top():
+        namespace = simpledialog.askstring("Namespace", "Ingresa el namespace:", parent=root)
+        if namespace:
+            comando = f"kubectl.exe top pod -n {namespace}"
+            copiar_comando(comando)
     
+    btn_top_pod = ctk.CTkButton(
+        frame_pods,
+        text="TOP",
+        command=generar_comando_top,
+        height=BUTTON_HEIGHT,
+        corner_radius=10,
+        font=("Arial", 11, "bold"),
+        width=20
+    )
+    btn_top_pod.grid(row=0, column=1, padx=5, pady=0)
+
+
+
+    
+
+    # Botón EVENTOS
     btn_ns = ctk.CTkButton(
-    frame_pods,
-    text="EVENTOS",
-    command=generar_comando_ns,
-    width=25,
+        frame_pods,
+        text="EVENTOS",
+        command=generar_comando_ns,
+        height=BUTTON_HEIGHT,
+        corner_radius=10,
+        font=("Arial", 11, "bold"),
+        width=10
+    )
+    btn_ns.grid(row=0, column=2, padx=5, pady=0)
 
 
-    font=("Arial", 11, "bold"),
-    height=BUTTON_HEIGHT
-)
-    btn_ns.grid(row=0, column=2, padx=5, pady=0)  # ← cambia esto
-    btn_ns.bind("<Enter>", on_enter)
-    btn_ns.bind("<Leave>", on_leave)
 
 
-    # 🔹 Eliminar PODs y LOGs
+    # Frame contenedor para los botones
     frame_pods_logs = ctk.CTkFrame(frame_kubectl, fg_color="#000000")
     frame_pods_logs.grid(row=2, column=0, columnspan=2, pady=1, sticky="ew")
+
+    # Configurar 3 columnas para centrar los botones
     frame_pods_logs.columnconfigure(0, weight=1)
     frame_pods_logs.columnconfigure(1, weight=1)
 
-    btn_eliminar_pods = ctk.CTkButton(frame_pods_logs, text="DELETE", command=eliminar_pods,
-                                  width=20, font=("Arial", 11, "bold"), height=BUTTON_HEIGHT,corner_radius=10 )
-    btn_eliminar_pods.grid(row=0, column=0, padx=5, pady=0)
-    btn_eliminar_pods.bind("<Enter>", on_enter)
-    btn_eliminar_pods.bind("<Leave>", on_leave)
 
+
+    # Botón DELETE
+    btn_eliminar_pods = ctk.CTkButton(
+        frame_pods_logs,
+        text="DELETE",
+        command=eliminar_pods,
+        height=BUTTON_HEIGHT,
+        corner_radius=10,
+        font=("Arial", 11, "bold"),
+        width=20
+    )
+    btn_eliminar_pods.grid(row=0, column=0, padx=5, pady=0)
+
+
+
+
+
+    # Botón LOGs GREP
     btn_logs = ctk.CTkButton(
-    frame_pods_logs,
-    text="LOGs GREP",
-    command=generar_logs,
-    width=20,
-    font=("Arial", 11, "bold"),
-    height=BUTTON_HEIGHT, corner_radius=10
+        frame_pods_logs,
+        text="LOGs GREP",
+        command=generar_logs,
+        height=BUTTON_HEIGHT,
+        corner_radius=10,
+        font=("Arial", 11, "bold"),
+        width=20
     )
     btn_logs.grid(row=0, column=1, padx=5, pady=0)
-    btn_logs.bind("<Enter>", on_enter)
-    btn_logs.bind("<Leave>", on_leave)
 
-    # 🔹 PODs NO RUNNING justo debajo
+
+
+    # Botón PODs NO RUNNING
     btn_pods_no_running = ctk.CTkButton(
         frame_pods_logs,
         text="PODs NO RUNNING",
         command=pods_no_running,
-        width=42,
-
-
+        height=BUTTON_HEIGHT,
+        corner_radius=10,
         font=("Arial", 11, "bold"),
-        height=BUTTON_HEIGHT,corner_radius=10
+        width=10
     )
-    btn_pods_no_running.grid(row=1, column=0, columnspan=2, padx=5, pady=5, sticky="ew")
-    btn_pods_no_running.bind("<Enter>", on_enter)
-    btn_pods_no_running.bind("<Leave>", on_leave)
+    btn_pods_no_running.grid(row=1, column=0, columnspan=3, padx=5, pady=5, sticky="ew")
 
-    # 🔹 PODs NO RUNNING (en un frame separado justo debajo)
-    frame_pods_no_running = ctk.CTkFrame(frame_kubectl, fg_color="#000000")
-    frame_pods_no_running.grid(row=4, column=0, columnspan=2, pady=(0, 5), sticky="ew")
-
-    btn_pods_no_running = ctk.CTkButton(
-        frame_pods_no_running,
-        text="PODs NO RUNNING",
-        command=pods_no_running,
-        width=42,
-
-
-        font=("Arial", 11, "bold"),
-        height=BUTTON_HEIGHT, corner_radius=10
-    )
-    btn_pods_no_running.pack(padx=5, pady=5, fill="x")
-    btn_pods_no_running.bind("<Enter>", on_enter)
-    btn_pods_no_running.bind("<Leave>", on_leave)
 
 
     # Inicio de la reubicación
     # Frame para el título y los botones de CLUSTER
+
+
     frame_cluster = ctk.CTkFrame(frame_kubectl, fg_color="#000000")
     frame_cluster.grid(row=3, column=0, columnspan=2, pady=1, sticky="ew")
+    
     frame_cluster.columnconfigure(0, weight=1)
     frame_cluster.columnconfigure(1, weight=1)
+
     label_cluster = ctk.CTkLabel(frame_cluster, text="CLUSTER", font=("Arial", 12, "bold"), fg_color="#000000")
     label_cluster.grid(row=0, column=0, columnspan=2,   pady=(3, 0), sticky="ew")
-    btn_listar_cluster = ctk.CTkButton(frame_cluster, text="LISTAR", command=listar_cluster, height=BUTTON_HEIGHT, corner_radius=10 , width=13, font=("Arial", 11, "bold"))
-    btn_listar_cluster.grid(row=1, column=0, padx=5, pady=(0, 5), sticky="ew")
-    btn_listar_cluster.bind("<Enter>", on_enter)
-    btn_listar_cluster.bind("<Leave>", on_leave)
-    btn_cluster = ctk.CTkButton(frame_cluster, text="INGRESAR", command=ingresar_a_cluster, height=BUTTON_HEIGHT, corner_radius=10 , width=13, font=("Arial", 11, "bold"))
-    btn_cluster.grid(row=1, column=1, padx=5, pady=(0, 5), sticky="ew")
-    btn_cluster.bind("<Enter>", on_enter)
-    btn_cluster.bind("<Leave>", on_leave)
-    # Fin de la reubicación
+    
+    
+
+
+    # Botón LISTAR
+    btn_listar_cluster = ctk.CTkButton(
+        frame_cluster,
+        text="LISTAR",
+        command=listar_cluster,
+        height=BUTTON_HEIGHT,
+        corner_radius=10,
+        font=("Arial", 11, "bold")
+    )
+    btn_listar_cluster.grid(row=1, column=0, padx=5, pady=(0, 5))
+
+    # Botón INGRESAR
+    btn_cluster = ctk.CTkButton(
+        frame_cluster,
+        text="INGRESAR",
+        command=ingresar_a_cluster,
+        height=BUTTON_HEIGHT,
+        corner_radius=10,
+        font=("Arial", 11, "bold")
+    )
+    btn_cluster.grid(row=1, column=1, padx=5, pady=(0, 5))
+
 
 
     # Título de la sección
     label_deployment = ctk.CTkLabel(frame_kubectl, text="DEPLOYMENT", font=("Arial", 12, "bold"), fg_color="#000000")
     label_deployment.grid(row=8, column=0, columnspan=2,   pady=(3, 0), sticky="ew")
     
-    # Crear un frame contenedor para los botones
+
     frame_deployment = ctk.CTkFrame(frame_kubectl, fg_color="#000000")
     frame_deployment.grid(row=9, column=0, columnspan=2, pady=1, sticky="ew")
+
+    # Configurar columnas para centrar los botones
     frame_deployment.columnconfigure(0, weight=1)
     frame_deployment.columnconfigure(1, weight=1)
+
     
     # Botón LISTAR
     def listar_deployment():
-        ns = simpledialog.askstring("Namespace", "Ingresa el namespace:")
+        ns = simpledialog.askstring("Namespace", "Ingresa el namespace:", parent=root)
         if ns:
             copiar_comando(f"kubectl get deployment -n {ns}")
     
-    btn_listar_d = ctk.CTkButton(frame_deployment, text="LISTAR", command=listar_deployment,
-                             width=15, font=("Arial", 11, "bold"), height=BUTTON_HEIGHT, corner_radius=10 )
+
+    # Botón LISTAR
+    btn_listar_d = ctk.CTkButton(
+        frame_deployment,
+        text="LISTAR",
+        command=listar_deployment,
+        height=BUTTON_HEIGHT,
+        corner_radius=10,
+        font=("Arial", 11, "bold")
+    )
     btn_listar_d.grid(row=0, column=0, padx=5, pady=5)
-    btn_listar_d.bind("<Enter>", on_enter)
-    btn_listar_d.bind("<Leave>", on_leave)
+
     
     # Botón DESCRIBIR
     def describir_deployment():
-        ns = simpledialog.askstring("Namespace", "Enter the namespace:")
-        name = simpledialog.askstring("Deployment", "Enter the deployment name:")
+        ns = simpledialog.askstring("Namespace", "Enter the namespace:", parent=root)
+        name = simpledialog.askstring("Deployment", "Enter the deployment name:", parent=root)
         if ns and name:
             copiar_comando(f"kubectl describe deployment -n {ns} {name}")
     
+
+    # Botón DESCRIBIR
     btn_describir_d = ctk.CTkButton(
         frame_deployment,
-        text="DESCRIBE",
+        text="DESCRIBIR",
         command=describir_deployment,
-        width=15,
-        font=("Arial", 11, "bold"),
-        height=BUTTON_HEIGHT, corner_radius=10 
+        height=BUTTON_HEIGHT,
+        corner_radius=10,
+        font=("Arial", 11, "bold")
     )
-    btn_describir_d.grid(row=0, column=1, padx=5, pady=0)
-    btn_describir_d.bind("<Enter>", on_enter)
-    btn_describir_d.bind("<Leave>", on_leave)
+    btn_describir_d.grid(row=0, column=1, padx=5, pady=5)
+
     
     # Título de la sección CONFIG MAP
     label_configmap = ctk.CTkLabel(frame_kubectl, text="CONFIG MAP", font=("Arial", 12, "bold"), fg_color="#000000")
     label_configmap.grid(row=10, column=0, columnspan=2,   pady=(3, 0), sticky="ew")
     
-    # Crear un frame contenedor para los botones
+
+    # Frame contenedor para los botones
     frame_configmap = ctk.CTkFrame(frame_kubectl, fg_color="#000000")
     frame_configmap.grid(row=11, column=0, columnspan=2, pady=1, sticky="ew")
+
+    # Configurar columnas para centrar los botones
     frame_configmap.columnconfigure(0, weight=1)
     frame_configmap.columnconfigure(1, weight=1)
+
     
     # Botón LISTAR CONFIG MAP
     def listar_configmap():
-        ns = simpledialog.askstring("Namespace", "Enter the namespace:")
+        ns = simpledialog.askstring("Namespace", "Enter the namespace:", parent=root)
         if ns:
             copiar_comando(f"kubectl.exe get configmaps -n {ns}")
     
-    btn_listar_c = ctk.CTkButton(frame_configmap, text="LISTAR", command=listar_configmap,
-                             width=15, font=("Arial", 11, "bold"), height=BUTTON_HEIGHT, corner_radius=10 )
+
+    # Botón LISTAR
+    btn_listar_c = ctk.CTkButton(
+        frame_configmap,
+        text="LISTAR",
+        command=listar_configmap,
+        height=BUTTON_HEIGHT,
+        corner_radius=10,
+        font=("Arial", 11, "bold")
+    )
     btn_listar_c.grid(row=0, column=0, padx=5, pady=5)
-    btn_listar_c.bind("<Enter>", on_enter)
-    btn_listar_c.bind("<Leave>", on_leave)
+
     
     # Botón DESCRIBIR CONFIG MAP
     def describir_configmap():
-        ns = simpledialog.askstring("Namespace", "Enter the namespace:")
-        name = simpledialog.askstring("ConfigMap", "Enter the configmap name:")
+        ns = simpledialog.askstring("Namespace", "Enter the namespace:", parent=root)
+        name = simpledialog.askstring("ConfigMap", "Enter the configmap name:", parent=root)
         if ns and name:
             copiar_comando(f"kubectl.exe describe configmap {name} -n {ns}")
     
+
+    # Botón DESCRIBIR
     btn_describir_c = ctk.CTkButton(
-    frame_configmap,
-    text="DESCRIBE",
-    command=describir_configmap,
-    width=15,
-    font=("Arial", 11, "bold"),
-    height=BUTTON_HEIGHT, corner_radius=10 
+        frame_configmap,
+        text="DESCRIBIR",
+        command=describir_configmap,
+        height=BUTTON_HEIGHT,
+        corner_radius=10,
+        font=("Arial", 11, "bold")
     )
-    btn_describir_c.grid(row=0, column=1, padx=5, pady=0)
-    btn_describir_c.bind("<Enter>", on_enter)
-    btn_describir_c.bind("<Leave>", on_leave)
+    btn_describir_c.grid(row=0, column=1, padx=5, pady=5)
+
 
     
 
@@ -1099,37 +1201,42 @@ filter log like /(?i)error|failed/
     label_cloudwatch = ctk.CTkLabel(frame_kubectl, text="EKS LOGs INSIGHTS", font=("Arial", 12, "bold"), fg_color="#000000")
     label_cloudwatch.grid(row=16, column=0, columnspan=2, pady=(3, 0), sticky="ew")
     
-    frame_kubectl.columnconfigure(0, weight=1)
-    frame_kubectl.columnconfigure(1, weight=1)
-    frame_kubectl.columnconfigure(2, weight=1)
+
+    # Frame contenedor para los botones
+    frame_cloudwatch = ctk.CTkFrame(frame_kubectl, fg_color="#000000")
+    frame_cloudwatch.grid(row=17, column=0, columnspan=2, pady=1, sticky="ew")
+
+    # Configurar columnas para centrar los botones
+    frame_cloudwatch.columnconfigure(0, weight=1)
+    frame_cloudwatch.columnconfigure(1, weight=1)
     
+
+    # Botón LOGs CON GREP
     btn_logs_grep = ctk.CTkButton(
-    frame_kubectl,
-    text="LOGs CON GREP",
-    command=generar_query_cloudwatch,
+        frame_cloudwatch,
+        text="LOGs CON GREP",
+        command=generar_query_cloudwatch,
+        height=BUTTON_HEIGHT,
+        corner_radius=10,
+        font=("Arial", 11, "bold"),
+        width=10
+    )
+    btn_logs_grep.grid(row=0, column=0, padx=5, pady=0)
 
 
-    font=("Arial", 11, "bold"),
-    height=BUTTON_HEIGHT, corner_radius=10 ,
-    width=16
-)
-    btn_logs_grep.grid(row=17, column=0, columnspan=3, padx=5, pady=0, sticky="ew")
-    btn_logs_grep.bind("<Enter>", on_enter)
-    btn_logs_grep.bind("<Leave>", on_leave)
 
+    # Botón CONTEO ERRORES
     btn_conteo_errores = ctk.CTkButton(
-        frame_kubectl,
+        frame_cloudwatch,
         text="CONTEO ERRORES",
         command=generar_query_cloudwatch_conteo,
-
-
+        height=BUTTON_HEIGHT,
+        corner_radius=10,
         font=("Arial", 11, "bold"),
-        height=BUTTON_HEIGHT, corner_radius=10 ,
-        width=16
+        width=10
     )
-    btn_conteo_errores.grid(row=18, column=0, columnspan=3, padx=5, pady=0, sticky="ew")
-    btn_conteo_errores.bind("<Enter>", on_enter)
-    btn_conteo_errores.bind("<Leave>", on_leave)
+    btn_conteo_errores.grid(row=0, column=1, padx=5, pady=0)
+
     
     # Crear un frame contenedor centrado en el grid
     frame_cmds = ctk.CTkFrame(frame_kubectl, fg_color="#000000")
@@ -1144,17 +1251,23 @@ filter log like /(?i)error|failed/
     label_exportlogs = ctk.CTkLabel(frame_kubectl, text="EXPORTAR LOGS", font=("Arial", 12, "bold"), fg_color="#000000")
     label_exportlogs.grid(row=12, column=0, columnspan=2, pady=(3, 0), sticky="ew")
     
-    # Crear un frame contenedor para los botones
+
+    # Frame contenedor para los botones
     frame_cmds = ctk.CTkFrame(frame_kubectl, fg_color="#000000")
     frame_cmds.grid(row=13, column=0, columnspan=2, pady=(5, 10), sticky="ew")
+
+    # Configurar columnas para centrar los botones
+    frame_cmds.columnconfigure(0, weight=1)
+    frame_cmds.columnconfigure(1, weight=1)
+
 
     
     
     def generar_bash_logs_grep():
-        pods_input = simpledialog.askstring("Pods", "Pega la salida de 'kubectl get pods':")
+        pods_input = simpledialog.askstring("Pods", "Pega la salida de 'kubectl get pods':", parent=root)
         if not pods_input:
             return
-        namespace_input = simpledialog.askstring("Namespace", "Ingresa el namespace:")
+        namespace_input = simpledialog.askstring("Namespace", "Ingresa el namespace:", parent=root)
         if not namespace_input:
             return
 
@@ -1180,20 +1293,28 @@ filter log like /(?i)error|failed/
         kubectl logs -n {namespace} $pod | grep -i -E '{grep_expr}' > $pod.txt
     done"""
 
-        # Mostrar en ventana editable
-        ventana_bash = ctk.CTkToplevel()
+
+        ventana_bash = ctk.CTkToplevel(root)
+        ventana_bash.transient(root)
+        ventana_bash.lift()
+        ventana_bash.focus_force()
         ventana_bash.title("Script Bash para Logs con GREP")
         ventana_bash.geometry("800x400")
-        ventana_bash.configure(fg_color="black")
+        ventana_bash.configure(fg_color="black")  # ← fondo negro visible
 
-        # Crear el widget de texto
-        frame_text = ctk.CTkFrame(ventana_bash, fg_color="black")
-        frame_text.pack(expand=True, fill="both", padx=10, pady=5)
-        text_widget = tk.Text(frame_text, wrap="word", font=("Consolas", 10))
+        text_widget = CTkTextbox(ventana_bash, wrap="word", font=("Consolas", 10))
         text_widget.pack(expand=True, fill="both", padx=10, pady=5)
-
-        # Insertar el contenido del script
         text_widget.insert("1.0", bash_script)
+        text_widget.configure(state="normal")
+
+        boton_copiar = ctk.CTkButton(
+            ventana_bash,
+            text="Copiar al portapapeles",
+            command=lambda: copiar_comando(bash_script),
+            font=("Arial", 11, "bold")
+        )
+        boton_copiar.pack(pady=5)
+
 
         # Copiar al portapapeles automáticamente
         ventana_bash.clipboard_clear()
@@ -1208,17 +1329,17 @@ filter log like /(?i)error|failed/
     
     
     def exportar_logs_kubectl():
-        pods_input = simpledialog.askstring("Pods", "Pega la salida de 'kubectl get pods':")
+        pods_input = simpledialog.askstring("Pods", "Pega la salida de 'kubectl get pods':", parent=root)
         if not pods_input:
             return
-        namespace_input = simpledialog.askstring("Namespace", "Ingresa el namespace:")
+        namespace_input = simpledialog.askstring("Namespace", "Ingresa el namespace:", parent=root)
         if not namespace_input:
             return
 
         pod_lines = pods_input.strip().splitlines()
         namespace = namespace_input.strip()
-
         comandos = []
+
         for line in pod_lines:
             partes = line.strip().split()
             if partes:
@@ -1226,16 +1347,28 @@ filter log like /(?i)error|failed/
                 comando = f"kubectl logs -n {namespace} {nombre_pod} > {nombre_pod}.txt"
                 comandos.append(comando)
 
-        comandos_final = "\n".join(comandos)
+        comandos_final = "\n".join(comandos) + "\n"
 
-
-
-        # Crear ventana editable con fondo blanco
-        ventana_comandos = ctk.CTkToplevel()
+        ventana_comandos = ctk.CTkToplevel(root)
+        ventana_comandos.transient(root)
+        ventana_comandos.lift()
+        ventana_comandos.focus_force()
         ventana_comandos.title("Comandos Generados")
         ventana_comandos.geometry("800x400")
-        ventana_comandos.configure(fg_color="black")  # ← ahora sí está completa
+        ventana_comandos.configure(fg_color="black")
 
+        text_widget = CTkTextbox(ventana_comandos, wrap="word", font=("Consolas", 10))
+        text_widget.pack(expand=True, fill="both", padx=10, pady=5)
+        text_widget.insert("1.0", comandos_final)
+        text_widget.configure(state="normal")
+
+        boton_copiar = ctk.CTkButton(
+            ventana_comandos,
+            text="Copiar al portapapeles",
+            command=lambda: copiar_comando(comandos_final),
+            font=("Arial", 11, "bold")
+        )
+        boton_copiar.pack(pady=5)
 
 
         # Insertar el contenido del script
@@ -1249,36 +1382,36 @@ filter log like /(?i)error|failed/
     frame_cmds.columnconfigure(0, weight=1)
     frame_cmds.columnconfigure(1, weight=1)
 
+
+    #Botón CON GREP
     btn_cmd3 = ctk.CTkButton(
         frame_cmds,
         text="CON GREP",
         command=generar_bash_logs_grep,
-        font=("Arial", 11, "bold"),
-        height=BUTTON_HEIGHT, corner_radius=10 
+        height=BUTTON_HEIGHT,
+        corner_radius=10,
+        font=("Arial", 11, "bold")
     )
-    btn_cmd3.grid(row=0, column=0, padx=5, pady=0, sticky="ew")
-    btn_cmd3.bind("<Enter>", on_enter)
-    btn_cmd3.bind("<Leave>", on_leave)
+    btn_cmd3.grid(row=0, column=0, padx=5, pady=0)
 
-
+    # Botón SIN GREP
     btn_cmd4 = ctk.CTkButton(
-    frame_cmds,
-    text="SIN GREP",
-    command=exportar_logs_kubectl,
-    font=("Arial", 11, "bold"),
-    height=BUTTON_HEIGHT, corner_radius=10 
+        frame_cmds,
+        text="SIN GREP",
+        command=exportar_logs_kubectl,
+        height=BUTTON_HEIGHT,
+        corner_radius=10,
+        font=("Arial", 11, "bold")
     )
-    btn_cmd4.grid(row=0, column=1, padx=5, pady=0, sticky="ew")
-    btn_cmd4.bind("<Enter>", on_enter)
+    btn_cmd4.grid(row=0, column=1, padx=5, pady=0)
 
-    btn_cmd4.bind("<Leave>", on_leave)
     
 def copiar_script(texto):
     """Copia el texto dado al portapapeles y muestra un mensaje."""
     root.clipboard_clear()
     root.clipboard_append(texto)
     root.update()
-    messagebox.showinfo("Comando Copiado", "El comando fué copiado.")
+    messagebox.showinfo("Comando Copiado", "El comando fué copiado.", parent=root)
 
 def mostrar_script():
     """
@@ -1304,18 +1437,23 @@ def mostrar_script():
     ventana_script.configure(fg_color="#000000")  # ← ahora sí está completa
 
     # Crear el frame contenedor
-    frame_script = ctk.CTkFrame(ventana_script, )
+    frame_script = ctk.CTkFrame(ventana_script, fg_color="black")
     frame_script.pack(expand=True, padx=5, pady=5)
 
     # Lista de textos para los botones
-    button_texts = ["GOKU", "SCRIPT1", "SCRIPT2", "SCRIPT3", "SCRIPT4", "SCRIPT5"]
+    button_texts = [("GOKU", "~/Documents/goku"),
+                    ("INICIO", "~/Documents/inicio"), 
+                    ("SCRIPT2", "SCRIPT2"), 
+                    ("SCRIPT3", "SCRIPT3"), 
+                    ("SCRIPT4", "SCRIPT4"), 
+                    ("SCRIPT5", "SCRIPT5")]
 
-    for text in button_texts:
+    for text, texto_a_copiar in button_texts:
         btn = ctk.CTkButton(
             frame_script,
             text=text,
-            command=lambda t=text: copiar_script(t),
-            height=BUTTON_HEIGHT, corner_radius=10 ,
+            command=lambda t=texto_a_copiar: copiar_script(t),
+            height=BUTTON_HEIGHT, corner_radius=10,
             font=("Arial", 11, "bold")
         )
         btn.pack(pady=1, fill="x")
@@ -1389,9 +1527,16 @@ label_otros.pack(pady=(3, 0))
 frame_otros = ctk.CTkFrame(frame_evento, fg_color="#000000")
 frame_otros.pack(pady=1)
 
-# Botón MONGO
-btn_mongo = ctk.CTkButton(frame_otros, text="MONGO", command=mostrar_mongo, font=("Arial", 11, "bold"), height=BUTTON_HEIGHT, width=65, corner_radius=10)
-btn_mongo.pack(pady=1)
+frame_mongo_cloud = ctk.CTkFrame(frame_otros, fg_color="#000000")
+frame_mongo_cloud.pack(pady=1)
+
+btn_mongo = ctk.CTkButton(frame_mongo_cloud, text="MONGO", command=mostrar_mongo,
+                          font=("Arial", 11, "bold"), height=BUTTON_HEIGHT, width=65, corner_radius=10)
+btn_mongo.pack(side=tk.LEFT, padx=5)
+
+btn_cloudshell = ctk.CTkButton(frame_mongo_cloud, text="CLOUDSHELL", command=mostrar_cloudshell,
+                               font=("Arial", 11, "bold"), height=BUTTON_HEIGHT, width=85, corner_radius=10)
+btn_cloudshell.pack(side=tk.LEFT, padx=5)
 
 # Subframe para CIBER e INFO CRQs
 frame_ciber_info = ctk.CTkFrame(frame_otros, fg_color="#000000")
@@ -1629,6 +1774,11 @@ def seleccionar_integrantes(turno):
                 listbox_seleccionados.insert(i + 1, texto)
                 listbox_seleccionados.selection_set(i + 1)
 
+
+
+    def quitar_seleccionados():
+        listbox_seleccionados.delete(0, tk.END)
+        
     def confirmar_seleccion():
         seleccionados = listbox_seleccionados.get(0, tk.END)
         if len(seleccionados) < 1:
@@ -1728,11 +1878,23 @@ def seleccionar_integrantes(turno):
     frame_mover = ctk.CTkFrame(frame_contenido, fg_color="#000000")
     frame_mover.pack(pady=1)
 
-    btn_subir = ctk.CTkButton(frame_mover, text="▲ Subir", command=mover_arriba, font=("Arial", 11, "bold"), height=25, width=70, corner_radius=10)
+    btn_subir = ctk.CTkButton(frame_mover, text="▲ Subir", command=mover_arriba, font=("Arial", 10, "bold"), height=25, width=40, corner_radius=10)
     btn_subir.pack(side=tk.LEFT, padx=5)
 
-    btn_bajar = ctk.CTkButton(frame_mover, text="▼ Bajar", command=mover_abajo, font=("Arial", 11, "bold"), height=25, width=70, corner_radius=10)
+    btn_bajar = ctk.CTkButton(frame_mover, text="▼ Bajar", command=mover_abajo, font=("Arial", 10, "bold"), height=25, width=40, corner_radius=10)
     btn_bajar.pack(side=tk.LEFT, padx=5)
+
+    btn_quitar = ctk.CTkButton(
+    frame_mover,
+    text="X Borrar",
+    command=quitar_seleccionados,
+    font=("Arial", 10, "bold"),
+    height=25,
+    width=40,
+    corner_radius=10
+    )
+    btn_quitar.pack(side=tk.LEFT, padx=5)
+
 
     btn_confirmar = ctk.CTkButton(frame_contenido, text="3. Generar", command=confirmar_seleccion, font=("Arial", 11, "bold"), height=25, width=70, corner_radius=10 )
     btn_confirmar.pack(pady=5)
@@ -1798,7 +1960,6 @@ def imagen_clicada(event):
     ventana_botones.geometry(f"230x520+{nueva_x}+{y}")
     ventana_botones.configure(fg_color="black")
     ventana_botones.resizable(False, False)
-
 
 
 #Canvas y scrollbar
