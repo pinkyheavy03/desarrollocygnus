@@ -826,7 +826,7 @@ def generar_comando_kubectl():
     ventana_opciones.title("GENERADOR DE COMANDOS")
     ventanas_hijas.append(ventana_opciones)
     ventana_opciones.transient(root)
-    ventana_opciones.geometry(f"230x420+{nueva_x}+{y}")
+    ventana_opciones.geometry(f"230x540+{nueva_x}+{y}")
     ventana_opciones.configure(fg_color="#000000")  # ← Aquí estaba el error
 
     # Crear el frame principal
@@ -899,34 +899,7 @@ def generar_comando_kubectl():
         comando = f"while true; do kubectl get po -n {namespace}{grep_pods}; echo \"\"; echo \"Actualizando...\"; echo \"\"; sleep 5; done" #
         mostrar_comando(comando, "LIVE")
 
-    def generar_query_cloudwatch():
-        pods_input = simpledialog.askstring("Pods", "Ingresa los nombres de los pods (puedes pegar la salida de 'kubectl get pods'):", parent=root)
-        if not pods_input:
-            return
-        namespace_input = simpledialog.askstring("Namespace", "Ingresa el namespace:", parent=root)
-        if not namespace_input:
-            return
-        pod_lines = pods_input.strip().splitlines()
-        pods = [f'"{line.split()[0]}"' for line in pod_lines if line.strip()]
-        namespace = namespace_input.strip()
-        pods_string = ", ".join(pods)
-        query = f"""
-fields @timestamp, @message, kubernetes.pod_name
-| filter kubernetes.namespace_name = "{namespace}"
-| filter kubernetes.pod_name in [{pods_string}] and log like /error|failed|Failed|Exception|exception|statuscode|ready|peering|undefined|url|messageid|database|ssl|detected|unable|Unable|certificate|certificado|certificates|unknown|status|504|500|GATEWAY_TIMEOUT|rejected|fatal|GATEWAY|TIMEOUT|KEYSTORE|null|RBAC|denied|SSL|ssl|INVALIDA|invalida|secret|Error|error|ERROR|conficts|refused|REFUSED|jwt|JWT|Server Error|not found|invalid|ready/
-| sort @timestamp desc
-| limit 2000
-"""
-        mostrar_comando(query.strip(), "CloudWatch Query")
 
-    def generar_query_cloudwatch_conteo():
-        query_conteo = """
-filter log like /(?i)error|failed/
-| stats count(*) as Error by kubernetes.pod_name, kubernetes.namespace_name
-| sort Error desc
-"""
-        mostrar_comando(query_conteo.strip(), "CloudWatch Conteo")
-        
     
     label_eks = ctk.CTkLabel(frame_kubectl, text="EKS", font=("Arial", 12, "bold"), fg_color="#000000")
     label_eks.grid(row=0, column=0, columnspan=2,   pady=(3, 0), sticky="ew")
@@ -963,7 +936,7 @@ filter log like /(?i)error|failed/
         if namespace:
             comando = f"kubectl.exe top pod -n {namespace}"
             copiar_comando(comando)
-    
+
     btn_top_pod = ctk.CTkButton(
         frame_pods,
         text="TOP",
@@ -1198,44 +1171,7 @@ filter log like /(?i)error|failed/
 
 
 
-    label_cloudwatch = ctk.CTkLabel(frame_kubectl, text="EKS LOGs INSIGHTS", font=("Arial", 12, "bold"), fg_color="#000000")
-    label_cloudwatch.grid(row=16, column=0, columnspan=2, pady=(3, 0), sticky="ew")
-    
 
-    # Frame contenedor para los botones
-    frame_cloudwatch = ctk.CTkFrame(frame_kubectl, fg_color="#000000")
-    frame_cloudwatch.grid(row=17, column=0, columnspan=2, pady=1, sticky="ew")
-
-    # Configurar columnas para centrar los botones
-    frame_cloudwatch.columnconfigure(0, weight=1)
-    frame_cloudwatch.columnconfigure(1, weight=1)
-    
-
-    # Botón LOGs CON GREP
-    btn_logs_grep = ctk.CTkButton(
-        frame_cloudwatch,
-        text="LOGs CON GREP",
-        command=generar_query_cloudwatch,
-        height=BUTTON_HEIGHT,
-        corner_radius=10,
-        font=("Arial", 11, "bold"),
-        width=10
-    )
-    btn_logs_grep.grid(row=0, column=0, padx=5, pady=0)
-
-
-
-    # Botón CONTEO ERRORES
-    btn_conteo_errores = ctk.CTkButton(
-        frame_cloudwatch,
-        text="CONTEO ERRORES",
-        command=generar_query_cloudwatch_conteo,
-        height=BUTTON_HEIGHT,
-        corner_radius=10,
-        font=("Arial", 11, "bold"),
-        width=10
-    )
-    btn_conteo_errores.grid(row=0, column=1, padx=5, pady=0)
 
     
     # Crear un frame contenedor centrado en el grid
@@ -1405,7 +1341,73 @@ filter log like /(?i)error|failed/
     )
     btn_cmd4.grid(row=0, column=1, padx=5, pady=0)
 
+
+
+    label_cloudwatch = ctk.CTkLabel(frame_kubectl, text="EKS LOGs INSIGHTS", font=("Arial", 12, "bold"), fg_color="#000000")
+    label_cloudwatch.grid(row=14, column=0, columnspan=2, pady=(3, 0), sticky="ew")
     
+    # Frame contenedor para los botones
+    frame_cloudwatch = ctk.CTkFrame(frame_kubectl, fg_color="#000000")
+    frame_cloudwatch.grid(row=15, column=0, columnspan=2, pady=1, sticky="ew")
+
+    # Configurar columnas para centrar los botones
+    frame_cloudwatch.columnconfigure(0, weight=1)
+    frame_cloudwatch.columnconfigure(1, weight=1)
+    
+    def generar_query_cloudwatch():
+        pods_input = simpledialog.askstring("Pods", "Ingresa los nombres de los pods (puedes pegar la salida de 'kubectl get pods'):", parent=root)
+        if not pods_input:
+            return
+        namespace_input = simpledialog.askstring("Namespace", "Ingresa el namespace:", parent=root)
+        if not namespace_input:
+            return
+        pod_lines = pods_input.strip().splitlines()
+        pods = [f'"{line.split()[0]}"' for line in pod_lines if line.strip()]
+        namespace = namespace_input.strip()
+        pods_string = ", ".join(pods)
+        query = f"""
+fields @timestamp, @message, kubernetes.pod_name
+| filter kubernetes.namespace_name = "{namespace}"
+| filter kubernetes.pod_name in [{pods_string}] and log like /error|failed|Failed|Exception|exception|statuscode|ready|peering|undefined|url|messageid|database|ssl|detected|unable|Unable|certificate|certificado|certificates|unknown|status|504|500|GATEWAY_TIMEOUT|rejected|fatal|GATEWAY|TIMEOUT|KEYSTORE|null|RBAC|denied|SSL|ssl|INVALIDA|invalida|secret|Error|error|ERROR|conficts|refused|REFUSED|jwt|JWT|Server Error|not found|invalid|ready/
+| sort @timestamp desc
+| limit 2000
+"""
+        mostrar_comando(query.strip(), "CloudWatch Query")
+    # Botón LOGs CON GREP
+    btn_logs_grep = ctk.CTkButton(
+        frame_cloudwatch,
+        text="CONGREP",
+        command=generar_query_cloudwatch,
+        height=BUTTON_HEIGHT,
+        corner_radius=10,
+        font=("Arial", 11, "bold"),
+        #width=10
+    )
+    btn_logs_grep.grid(row=0, column=0, padx=5, pady=5)
+
+
+    def generar_query_cloudwatch_conteo():
+        query_conteo = """
+filter log like /(?i)error|failed/
+| stats count(*) as Error by kubernetes.pod_name, kubernetes.namespace_name
+| sort Error desc
+"""
+        mostrar_comando(query_conteo.strip(), "CloudWatch Conteo")
+        
+    # Botón CONTEO ERRORES
+    btn_conteo_errores = ctk.CTkButton(
+        frame_cloudwatch,
+        text="CONTEO",
+        command=generar_query_cloudwatch_conteo,
+        height=BUTTON_HEIGHT,
+        corner_radius=10,
+        font=("Arial", 11, "bold"),
+        #width=10
+    )
+    btn_conteo_errores.grid(row=0, column=1, padx=5, pady=5)
+
+        
+            
 def copiar_script(texto):
     """Copia el texto dado al portapapeles y muestra un mensaje."""
     root.clipboard_clear()
