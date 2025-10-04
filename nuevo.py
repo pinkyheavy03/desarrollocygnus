@@ -826,7 +826,7 @@ def generar_comando_kubectl():
     ventana_opciones.title("GENERADOR DE COMANDOS")
     ventanas_hijas.append(ventana_opciones)
     ventana_opciones.transient(root)
-    ventana_opciones.geometry(f"230x540+{nueva_x}+{y}")
+    ventana_opciones.geometry(f"230x500+{nueva_x}+{y}")
     ventana_opciones.configure(fg_color="#000000")  # ← Aquí estaba el error
 
     # Crear el frame principal
@@ -1166,23 +1166,6 @@ def generar_comando_kubectl():
     btn_describir_c.grid(row=0, column=1, padx=5, pady=5)
 
 
-    
-
-
-
-
-
-
-    
-    # Crear un frame contenedor centrado en el grid
-    frame_cmds = ctk.CTkFrame(frame_kubectl, fg_color="#000000")
-    frame_cmds.grid(row=15, column=0, columnspan=2, pady=1, sticky="ew")
-
-    # Centrar el contenido dentro del frame
-    frame_cmds.columnconfigure(0, weight=1)
-    frame_cmds.columnconfigure(1, weight=1)
-
-
     # Título EXPORTAR LOGS
     label_exportlogs = ctk.CTkLabel(frame_kubectl, text="EXPORTAR LOGS", font=("Arial", 12, "bold"), fg_color="#000000")
     label_exportlogs.grid(row=12, column=0, columnspan=2, pady=(3, 0), sticky="ew")
@@ -1352,7 +1335,6 @@ def generar_comando_kubectl():
 
     # Configurar columnas para centrar los botones
     frame_cloudwatch.columnconfigure(0, weight=1)
-    frame_cloudwatch.columnconfigure(1, weight=1)
     
     def generar_query_cloudwatch():
         pods_input = simpledialog.askstring("Pods", "Ingresa los nombres de los pods (puedes pegar la salida de 'kubectl get pods'):", parent=root)
@@ -1370,16 +1352,19 @@ fields @timestamp, @message, kubernetes.pod_name
 | filter kubernetes.namespace_name = "{namespace}"
 | filter kubernetes.pod_name in [{pods_string}] and log like /error|failed|Failed|Exception|exception|statuscode|ready|peering|undefined|url|messageid|database|ssl|detected|unable|Unable|certificate|certificado|certificates|unknown|status|504|500|GATEWAY_TIMEOUT|rejected|fatal|GATEWAY|TIMEOUT|KEYSTORE|null|RBAC|denied|SSL|ssl|INVALIDA|invalida|secret|Error|error|ERROR|conficts|refused|REFUSED|jwt|JWT|Server Error|not found|invalid|ready/
 | sort @timestamp desc
-| limit 2000
+| limit 10000
 """
         mostrar_comando(query.strip(), "CloudWatch Query")
+        
+        
+        
     # Botón LOGs CON GREP
     btn_logs_grep = ctk.CTkButton(
         frame_cloudwatch,
-        text="CONGREP",
+        text="GREP YA DEFINIDOS",
         command=generar_query_cloudwatch,
         height=BUTTON_HEIGHT,
-        corner_radius=10,
+        corner_radius=8,
         font=("Arial", 11, "bold"),
         #width=10
     )
@@ -1387,26 +1372,85 @@ fields @timestamp, @message, kubernetes.pod_name
 
 
     def generar_query_cloudwatch_conteo():
-        query_conteo = """
-filter log like /(?i)error|failed/
-| stats count(*) as Error by kubernetes.pod_name, kubernetes.namespace_name
-| sort Error desc
-"""
-        mostrar_comando(query_conteo.strip(), "CloudWatch Conteo")
+        
+        pods_input = simpledialog.askstring("Pods", "Pega la salida de 'kubectl get po -n <namespace>':", parent=root)
+        if not pods_input:
+            return
+        
+        namespace_input = simpledialog.askstring("Namespace", "Ingresa el namespace:", parent=root)
+        if not namespace_input:
+            return
+
+
+
+        error_input = simpledialog.askstring("Palabra clave", "Ingresa la palabra clave o error a contar:", parent=root)
+        if not error_input:
+            return
+
+        pod_lines = pods_input.strip().splitlines()
+        pods = [f'"{line.split()[0]}"' for line in pod_lines if line.strip()]
+        pods_string = ", ".join(pods)
+
+        query_conteo = f"""
+    filter kubernetes.namespace_name = "{namespace_input}"
+    | filter kubernetes.pod_name in [{pods_string}] and log like /(?i){error_input}/
+    | stats count(*) as Error by kubernetes.pod_name, kubernetes.namespace_name
+    | sort Error desc
+    """
+        mostrar_comando(query_conteo.strip(), "CloudWatch Conteo por Palabra Clave")
         
     # Botón CONTEO ERRORES
     btn_conteo_errores = ctk.CTkButton(
         frame_cloudwatch,
-        text="CONTEO",
+        text="CONTEO 'ERRORES POR POD'",
         command=generar_query_cloudwatch_conteo,
         height=BUTTON_HEIGHT,
         corner_radius=10,
         font=("Arial", 11, "bold"),
         #width=10
     )
-    btn_conteo_errores.grid(row=0, column=1, padx=5, pady=5)
+    btn_conteo_errores.grid(row=2, column=0, padx=5, pady=5)
 
-        
+    def generar_query_grep_palabra_clave():
+        pods_input = simpledialog.askstring("Pods", "Pega la salida de 'kubectl get po -n <namespace>':", parent=root)
+        if not pods_input:
+            return
+
+        namespace_input = simpledialog.askstring("Namespace", "Ingresa el namespace:", parent=root)
+        if not namespace_input:
+            return
+
+        error_input = simpledialog.askstring("Palabra clave", "Ingresa la palabra clave o error a buscar:", parent=root)
+        if not error_input:
+            return
+
+        pod_lines = pods_input.strip().splitlines()
+        pods = [f'"{line.split()[0]}"' for line in pod_lines if line.strip()]
+        namespace = namespace_input.strip()
+        pods_string = ", ".join(pods)
+
+        query = f"""
+    fields @timestamp, @message, kubernetes.pod_name
+    | filter kubernetes.namespace_name = "{namespace}"
+    | filter kubernetes.pod_name in [{pods_string}] and log like /{error_input}/
+    | sort @timestamp desc
+    | limit 10000
+    """
+        mostrar_comando(query.strip(), "CloudWatch GREP PALABRA CLAVE")
+
+    btn_grep_palabra_clave = ctk.CTkButton(
+        frame_cloudwatch,
+        text="GREP 'ERROR ESPECIFICO'",
+        command=generar_query_grep_palabra_clave,
+        height=BUTTON_HEIGHT,
+        corner_radius=10,
+        font=("Arial", 11, "bold")
+    )
+    btn_grep_palabra_clave.grid(row=1, column=0, padx=5, pady=5, sticky="ew")
+    
+    
+    
+    
             
 def copiar_script(texto):
     """Copia el texto dado al portapapeles y muestra un mensaje."""
